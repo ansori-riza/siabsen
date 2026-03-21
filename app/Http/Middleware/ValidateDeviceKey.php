@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Perangkat;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,23 @@ class ValidateDeviceKey
         if (!$deviceKey) {
             return response()->json([
                 'success' => false,
-                'message' => 'Device key tidak ditemukan'
+                'message' => 'Missing X-Device-Key header',
             ], 401);
         }
+
+        $perangkat = Perangkat::where('device_key', $deviceKey)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$perangkat) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or inactive device key',
+            ], 401);
+        }
+
+        // Attach perangkat to request for controller access
+        $request->attributes->set('perangkat', $perangkat);
 
         return $next($request);
     }
