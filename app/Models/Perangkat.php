@@ -17,7 +17,7 @@ class Perangkat extends Model
         'nama',
         'lokasi',
         'device_key',
-        'device_type',
+        'tipe',
         'status',
         'last_ping',
         'is_active',
