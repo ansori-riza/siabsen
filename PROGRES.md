@@ -382,3 +382,26 @@ ASSET_URL=${APP_URL}                 # Untuk force HTTPS assets
    - PIC evaluasi: operator + penanggung jawab teknis + kepala sekolah/wakil yang ditunjuk.
 
 ---
+
+## 🧾 CATATAN DEPLOYMENT INTERNAL TIM
+
+### 21 Maret 2026 — Verifikasi pasca migrasi (Railway)
+
+- Target langkah:
+  1. Buka shell service `siabsen` di Railway.
+  2. Jalankan `php artisan migrate --force`.
+  3. Jalankan `php artisan db:seed --force`.
+  4. Verifikasi endpoint health `/up`.
+- Status eksekusi dari environment automation saat ini:
+  - ⚠️ **Belum bisa dieksekusi langsung ke Railway** karena sesi ini tidak terhubung ke dashboard/shell Railway service.
+  - ⚠️ Validasi lokal juga terblokir dependency: `composer install` gagal pada PHP `8.5.3-dev` karena paket lock (`openspout/openspout v4.28.5`) hanya mendukung `~8.2/~8.3/~8.4`.
+- Dampak:
+  - Perintah migrasi/seed **belum tervalidasi** pada service Railway dari sesi ini.
+  - Endpoint `/up` **belum bisa dikonfirmasi** dari sesi ini sebagai bukti pasca migrasi.
+- Tindak lanjut operasional (jalankan di Railway shell service `siabsen`):
+  ```bash
+  php artisan migrate --force
+  php artisan db:seed --force
+  curl -i "$APP_URL/up"
+  ```
+  Kriteria lulus: respons HTTP `200` pada `/up` setelah dua perintah artisan selesai tanpa error.
