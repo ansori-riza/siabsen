@@ -46,8 +46,8 @@ class GuruResource extends Resource
                             ->required(),
                         Forms\Components\TextInput::make('employment_detail')
                             ->label('Detail Kepegawaian')
-                            ->placeholder('Contoh: Ustadz Tetap, Guru Pondok, Guru Yayasan')
-                            ->helperText('Opsional: boleh diisi seperti “Ustadz Tetap”, “Musyrif”, “Pengasuh”, dst.')
+                            ->placeholder('Contoh: ' . Sekolah::getGuruLabel() . ' Tetap, ' . Sekolah::getClassGuardianLabel() . ', Pengasuh')
+                            ->helperText('Opsional: boleh diisi sesuai istilah di lembaga Anda.')
                             ->maxLength(255),
                     ])->columns(2),
 

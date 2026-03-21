@@ -51,19 +51,19 @@ class Sekolah extends Model
 
     public static function getLabelDictionary(): array
     {
-        return match (self::getCurrentInstitutionType()) {
-            self::INSTITUTION_TYPE_PONDOK,
-            self::INSTITUTION_TYPE_MADRASAH => [
-                'guru_label' => 'Ustadz/Pengajar',
-                'class_guardian_label' => 'Musyrif Kelas',
-                'student_label' => 'Murid',
-            ],
-            default => [
-                'guru_label' => 'Guru',
-                'class_guardian_label' => 'Wali Kelas',
-                'student_label' => 'Murid',
-            ],
-        };
+        $fallback = config('domain_labels.defaults', [
+            'guru_label' => 'Guru',
+            'class_guardian_label' => 'Wali Kelas',
+            'student_label' => 'Murid',
+        ]);
+
+        $fromInstitution = config('domain_labels.institution_types.' . self::getCurrentInstitutionType(), []);
+
+        return [
+            'guru_label' => data_get($fromInstitution, 'guru_label') ?: data_get($fallback, 'guru_label', 'Guru'),
+            'class_guardian_label' => data_get($fromInstitution, 'class_guardian_label') ?: data_get($fallback, 'class_guardian_label', 'Wali Kelas'),
+            'student_label' => data_get($fromInstitution, 'student_label') ?: data_get($fallback, 'student_label', 'Murid'),
+        ];
     }
 
     public static function getGuruLabel(): string
