@@ -350,3 +350,27 @@ ASSET_URL=${APP_URL}                 # Untuk force HTTPS assets
 ---
 
 *Dokumen ini akan diupdate saat progress berlanjut.*
+
+
+## 📈 RENCANA KPI BULAN PERTAMA (MINGGU 1-4)
+
+1. **Definisi KPI minimum yang dipantau**
+   - **Persentase absensi tercatat otomatis** = (jumlah absensi otomatis ÷ total absensi) × 100%.
+   - **Jumlah koreksi manual** per hari/per minggu (edit absensi karena salah status/jam/subjek).
+   - **Waktu rekap harian** = durasi dari akhir jam pulang sampai rekap siap diverifikasi operator.
+
+2. **Baseline minggu pertama sebagai pembanding**
+   - Minggu pertama dijadikan **baseline resmi** untuk ketiga KPI.
+   - Simpan baseline per hari dan rerata mingguan agar tren minggu 2-4 bisa dibandingkan langsung.
+
+3. **Ambang sehat operasional**
+   - Persentase absensi otomatis: **>95%** (minimal sehat).
+   - Koreksi manual: **<=5% dari total absensi harian** atau turun konsisten dari baseline.
+   - Waktu rekap harian: **<=30 menit** setelah jam pulang berakhir.
+
+4. **Jadwal evaluasi mingguan (1 bulan pertama)**
+   - Evaluasi setiap akhir minggu pada **Minggu 1, 2, 3, dan 4**.
+   - Format evaluasi: ringkas capaian KPI vs baseline, akar masalah utama, dan action item minggu berikutnya.
+   - PIC evaluasi: operator + penanggung jawab teknis + kepala sekolah/wakil yang ditunjuk.
+
+---
