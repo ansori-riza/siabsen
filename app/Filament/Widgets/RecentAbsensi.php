@@ -32,7 +32,7 @@ class RecentAbsensi extends BaseWidget
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label('Sebagai')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getEducatorLabel() : 'Murid')
+                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getGuruLabel() : Sekolah::getStudentLabel())
                     ->color(fn (string $state): string => $state === 'App\Models\Guru' ? 'success' : 'info'),
                 Tables\Columns\TextColumn::make('tipe')
                     ->label('Tipe')

@@ -28,8 +28,8 @@ class JadwalSekolahResource extends Resource
                 Forms\Components\Select::make('role_target')
                     ->label('Untuk')
                     ->options([
-                        'murid' => 'Murid',
-                        'guru' => Sekolah::getEducatorLabel(),
+                        'murid' => Sekolah::getStudentLabel(),
+                        'guru' => Sekolah::getGuruLabel(),
                     ])
                     ->required()
                     ->default('murid'),
@@ -66,7 +66,7 @@ class JadwalSekolahResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('role_target')
                     ->label('Untuk')
-                    ->formatStateUsing(fn (string $state): string => $state === 'guru' ? Sekolah::getEducatorLabel() : 'Murid')
+                    ->formatStateUsing(fn (string $state): string => $state === 'guru' ? Sekolah::getGuruLabel() : Sekolah::getStudentLabel())
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'murid' => 'info',
@@ -94,8 +94,8 @@ class JadwalSekolahResource extends Resource
                 Tables\Filters\SelectFilter::make('role_target')
                     ->label('Untuk')
                     ->options([
-                        'murid' => 'Murid',
-                        'guru' => Sekolah::getEducatorLabel(),
+                        'murid' => Sekolah::getStudentLabel(),
+                        'guru' => Sekolah::getGuruLabel(),
                     ]),
                 Tables\Filters\SelectFilter::make('hari')
                     ->label('Hari')

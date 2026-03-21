@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\KelasResource\Pages;
 use App\Models\Kelas;
+use App\Models\Sekolah;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,11 +38,11 @@ class KelasResource extends Resource
                     ->maxValue(12)
                     ->default(7),
                 Forms\Components\Select::make('wali_kelas_id')
-                    ->label('Wali Kelas')
+                    ->label(Sekolah::getClassGuardianLabel())
                     ->relationship('waliKelas', 'nama')
                     ->searchable()
                     ->preload()
-                    ->placeholder('Pilih guru sebagai wali kelas'),
+                    ->placeholder('Pilih ' . strtolower(Sekolah::getGuruLabel()) . ' sebagai ' . strtolower(Sekolah::getClassGuardianLabel())),
                 Forms\Components\TextInput::make('kapasitas')
                     ->label('Kapasitas')
                     ->numeric()
@@ -63,7 +64,7 @@ class KelasResource extends Resource
                     ->label('Tingkat')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('waliKelas.nama')
-                    ->label('Wali Kelas')
+                    ->label(Sekolah::getClassGuardianLabel())
                     ->placeholder('Belum ditentukan'),
                 Tables\Columns\TextColumn::make('kapasitas')
                     ->label('Kapasitas'),

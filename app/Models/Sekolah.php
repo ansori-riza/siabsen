@@ -46,11 +46,39 @@ class Sekolah extends Model
 
     public static function getEducatorLabel(): string
     {
+        return self::getGuruLabel();
+    }
+
+    public static function getLabelDictionary(): array
+    {
         return match (self::getCurrentInstitutionType()) {
             self::INSTITUTION_TYPE_PONDOK,
-            self::INSTITUTION_TYPE_MADRASAH => 'Ustadz/Pengajar',
-            default => 'Guru',
+            self::INSTITUTION_TYPE_MADRASAH => [
+                'guru_label' => 'Ustadz/Pengajar',
+                'class_guardian_label' => 'Musyrif Kelas',
+                'student_label' => 'Murid',
+            ],
+            default => [
+                'guru_label' => 'Guru',
+                'class_guardian_label' => 'Wali Kelas',
+                'student_label' => 'Murid',
+            ],
         };
+    }
+
+    public static function getGuruLabel(): string
+    {
+        return self::getLabelDictionary()['guru_label'];
+    }
+
+    public static function getClassGuardianLabel(): string
+    {
+        return self::getLabelDictionary()['class_guardian_label'];
+    }
+
+    public static function getStudentLabel(): string
+    {
+        return self::getLabelDictionary()['student_label'];
     }
 
     public function gurus(): HasMany { return $this->hasMany(Guru::class); }
