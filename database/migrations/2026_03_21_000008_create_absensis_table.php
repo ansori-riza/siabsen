@@ -16,11 +16,11 @@ return new class extends Migration
             $table->enum('tipe', ['masuk', 'pulang']);
             $table->enum('status', ['hadir', 'terlambat', 'alpha'])->default('alpha');
             $table->enum('metode', ['rfid', 'fingerprint', 'manual'])->default('rfid');
-            $table->dateTime('waktu');
+            $table->dateTime('waktu_absen');
             $table->string('keterangan')->nullable();
             $table->timestamps();
 
-            $table->index(['subject_type', 'subject_id', 'tipe', 'waktu']);
+            $table->index(['subject_type', 'subject_id', 'tipe', 'waktu_absen']);
         });
     }
 

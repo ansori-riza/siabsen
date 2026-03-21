@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AbsensiResource\Pages;
 use App\Models\Absensi;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -42,7 +43,7 @@ class AbsensiResource extends Resource
                         Forms\Components\Select::make('metode')
                             ->label('Metode')
                             ->options([
-                                'RFID' => 'RFID',
+                                'rfid' => 'RFID',
                                 'fingerprint' => 'Fingerprint',
                                 'manual' => 'Manual',
                             ])
@@ -99,11 +100,20 @@ class AbsensiResource extends Resource
                 Tables\Columns\TextColumn::make('metode')
                     ->label('Metode')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'RFID' => 'info',
+                    ->formatStateUsing(function (mixed $state): string {
+                        $value = $state instanceof BackedEnum ? $state->value : (string) $state;
+
+                        return strtoupper($value);
+                    })
+                    ->color(function (mixed $state): string {
+                        $value = $state instanceof BackedEnum ? $state->value : (string) $state;
+
+                        return match ($value) {
+                        'rfid' => 'info',
                         'fingerprint' => 'success',
                         'manual' => 'warning',
                         default => 'gray',
+                        };
                     }),
                 Tables\Columns\TextColumn::make('perangkat.nama')
                     ->label('Perangkat')
@@ -127,7 +137,7 @@ class AbsensiResource extends Resource
                 Tables\Filters\SelectFilter::make('metode')
                     ->label('Metode')
                     ->options([
-                        'RFID' => 'RFID',
+                        'rfid' => 'RFID',
                         'fingerprint' => 'Fingerprint',
                         'manual' => 'Manual',
                     ]),
