@@ -2,7 +2,7 @@
 
 > Dokumen ini berisi status implementasi SiAbsen (Sistem Absensi Sekolah Berbasis RFID & Fingerprint)
 > Tanggal: 21 Maret 2026
-> Status: Phase 1 - MVP Development
+> Status: Phase 1 - MVP Development (core code generic, UI labels configurable)
 
 ---
 
