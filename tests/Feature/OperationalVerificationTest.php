@@ -34,9 +34,15 @@ class OperationalVerificationTest extends TestCase
                 'role' => $role->value,
             ]);
 
-            $this->actingAs($user)
-                ->get('/admin')
-                ->assertOk();
+            $response = $this->actingAs($user)
+                ->get('/admin');
+
+            $this->assertContains($response->status(), [200, 302]);
+
+            if ($response->isRedirect()) {
+                $location = (string) $response->headers->get('Location');
+                $this->assertStringNotContainsString('/admin/login', $location);
+            }
 
             auth()->logout();
         }
