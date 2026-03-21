@@ -4,12 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\JadwalSekolahResource\Pages;
 use App\Models\JadwalSekolah;
+use App\Support\DayOfWeekMapper;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class JadwalSekolahResource extends Resource
 {
@@ -34,14 +34,7 @@ class JadwalSekolahResource extends Resource
                     ->default('murid'),
                 Forms\Components\Select::make('hari')
                     ->label('Hari')
-                    ->options([
-                        'Senin' => 'Senin',
-                        'Selasa' => 'Selasa',
-                        'Rabu' => 'Rabu',
-                        'Kamis' => 'Kamis',
-                        'Jumat' => 'Jumat',
-                        'Sabtu' => 'Sabtu',
-                    ])
+                    ->options(DayOfWeekMapper::options())
                     ->required(),
                 Forms\Components\TimePicker::make('jam_masuk')
                     ->label('Jam Masuk')
@@ -80,6 +73,7 @@ class JadwalSekolahResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('hari')
                     ->label('Hari')
+                    ->formatStateUsing(fn (int $state): string => DayOfWeekMapper::toLabel($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('jam_masuk')
                     ->label('Jam Masuk')
@@ -103,14 +97,7 @@ class JadwalSekolahResource extends Resource
                     ]),
                 Tables\Filters\SelectFilter::make('hari')
                     ->label('Hari')
-                    ->options([
-                        'Senin' => 'Senin',
-                        'Selasa' => 'Selasa',
-                        'Rabu' => 'Rabu',
-                        'Kamis' => 'Kamis',
-                        'Jumat' => 'Jumat',
-                        'Sabtu' => 'Sabtu',
-                    ]),
+                    ->options(DayOfWeekMapper::options()),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Status Aktif'),
             ])
