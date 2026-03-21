@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MetodeAbsensi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +27,7 @@ class Absensi extends Model
 
     protected $casts = [
         'waktu_absen' => 'datetime',
+        'metode' => MetodeAbsensi::class,
     ];
 
     public function sekolah(): BelongsTo

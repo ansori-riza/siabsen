@@ -80,11 +80,11 @@ class AbsensiController extends Controller
             'subject_id' => $user->id,
             'tipe' => $validated['tipe'],
             'status' => $status,
-            'metode' => $validated['rfid_uid'] ? 'RFID' : 'fingerprint',
+            'metode' => $validated['rfid_uid'] ? 'rfid' : 'fingerprint',
             'waktu_absen' => now(),
         ]);
 
-        return $this->successResponse($user, $status, $validated['tipe'], $absensi->metode);
+        return $this->successResponse($user, $status, $validated['tipe'], $absensi->metode->value);
     }
 
     /**
@@ -165,7 +165,7 @@ class AbsensiController extends Controller
     /**
      * Response sukses dengan feedback untuk ESP32
      */
-    private function successResponse(object $user, string $status, string $tipe, string $metode = 'RFID'): JsonResponse
+    private function successResponse(object $user, string $status, string $tipe, string $metode = 'rfid'): JsonResponse
     {
         $statusLabels = [
             'hadir' => 'HADIR',
