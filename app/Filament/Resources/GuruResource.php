@@ -36,10 +36,10 @@ class GuruResource extends Resource
                             ->maxLength(100),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'PNS' => 'PNS',
-                                'Honorer' => 'Honorer',
+                                'pns' => 'PNS',
+                                'honor' => 'Honorer',
                             ])
-                            ->default('Honorer'),
+                            ->default('honor'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Kartu & Biometrik')
