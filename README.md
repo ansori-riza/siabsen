@@ -78,6 +78,8 @@ Pastikan variabel berikut benar sebelum onboarding device atau go-live:
 
 - **APP URL**
   - `APP_URL` harus sesuai domain/aplikasi yang diakses user.
+  - Untuk deploy Railway, isi `APP_URL` secara **eksplisit** dengan domain aktif service, mis. `https://<service>.up.railway.app`, khususnya saat variabel otomatis seperti `RAILWAY_STATIC_URL` tidak tersedia.
+  - Jika `APP_URL` salah, dampaknya bisa meluas: redirect login/logout melenceng, callback autentikasi gagal, domain/scope cookie tidak cocok (session sering logout), dan URL asset (CSS/JS/admin panel) bisa mengarah ke host yang salah.
 - **Database**
   - `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
 - **Timezone**

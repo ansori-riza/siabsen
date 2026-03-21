@@ -17,6 +17,7 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 - [ ] Jalankan `git pull` pada branch/tag rilis yang sudah disetujui.
 - [ ] Verifikasi `railway.json` pada branch rilis: `deploy.startCommand` saat ini fokus pada cache/warmup + `php artisan serve` dan **belum** menjalankan `php artisan migrate --force` otomatis.
 - [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` dan `NPM_CONFIG_OPTIONAL=false` sudah diset agar fase build memakai Node.js 22 sekaligus menghindari error optional dependency npm pada native binding.
+- [ ] **Railway (APP_URL)**: jika `RAILWAY_STATIC_URL` tidak tersedia, isi `APP_URL` secara eksplisit dengan domain aktif service (`https://<service>.up.railway.app`) agar URL absolut, redirect, dan cookie tetap konsisten.
 - [ ] Jalankan `composer install --no-dev --optimize-autoloader`.
 - [ ] Jalankan `npm ci && npm run build`.
 - [ ] Jalankan `php artisan migrate --force`.
@@ -48,6 +49,8 @@ Untuk mencegah kegagalan build front-end di Railway:
    - **Value**: `22`
    - **Key**: `NPM_CONFIG_OPTIONAL`
    - **Value**: `false`
+   - **Key**: `APP_URL`
+   - **Value**: `https://<service>.up.railway.app` (gunakan domain aktif service `web`; jangan kosong)
 4. Simpan, lalu trigger **Redeploy** service `web`.
 5. Verifikasi di log fase `npm ci`/`npm run build` bahwa pesan berikut **tidak muncul lagi**:
    - `Vite requires Node.js version 20.19+ or 22+`
