@@ -16,18 +16,8 @@ class DeviceController extends Controller
      */
     public function heartbeat(Request $request): JsonResponse
     {
-        $deviceKey = $request->header('X-Device-Key');
-        
-        $perangkat = Perangkat::where('device_key', $deviceKey)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$perangkat) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Device not found',
-            ], 401);
-        }
+        /** @var Perangkat $perangkat */
+        $perangkat = $request->attributes->get('perangkat');
 
         $perangkat->update([
             'status' => 'online',
@@ -46,18 +36,8 @@ class DeviceController extends Controller
      */
     public function sync(Request $request): JsonResponse
     {
-        $deviceKey = $request->header('X-Device-Key');
-        
-        $perangkat = Perangkat::where('device_key', $deviceKey)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$perangkat) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Device not found',
-            ], 401);
-        }
+        /** @var Perangkat $perangkat */
+        $perangkat = $request->attributes->get('perangkat');
 
         // Ambil jadwal hari ini
         $hariIni = DayOfWeekMapper::today();
