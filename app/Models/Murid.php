@@ -10,7 +10,7 @@ class Murid extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
         'sekolah_id', 'kelas_id', 'nis', 'nama', 'rfid_uid', 'fingerprint_id',
-        'jenis_kelamin', 'tanggal_lahir', 'foto', 'ortu_nama', 'ortu_hp', 'alamat', 'is_active'
+        'jenis_kelamin', 'tanggal_lahir', 'foto', 'nama_ortu', 'hp_ortu', 'alamat', 'is_active'
     ];
     protected $casts = ['tanggal_lahir' => 'date', 'fingerprint_id' => 'integer'];
     public function sekolah(): BelongsTo { return $this->belongsTo(Sekolah::class); }
