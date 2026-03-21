@@ -57,3 +57,12 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Integrasi Hardware
+
+Untuk integrasi perangkat absensi (ESP32, RFID, fingerprint), lihat dokumentasi API hardware berikut:
+
+- [API Hardware Integration](docs/API_HARDWARE.md)
+- [Hardware Compatibility](docs/HARDWARE_COMPATIBILITY.md)
+
+Dokumen API mencakup endpoint, header wajib `X-Device-Key`, format payload RFID/fingerprint, pola response, strategi retry, dan baseline keamanan publik.
