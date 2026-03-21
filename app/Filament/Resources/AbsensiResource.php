@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AbsensiResource\Pages;
 use App\Models\Absensi;
 use App\Models\Sekolah;
+use App\Models\User;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -21,6 +22,24 @@ class AbsensiResource extends Resource
     protected static ?string $modelLabel = 'Absensi';
     protected static ?string $pluralModelLabel = 'Absensi';
     protected static ?int $navigationSort = 7;
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user() instanceof User
+            && auth()->user()->hasPermission('view_absensi');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user() instanceof User
+            && auth()->user()->hasPermission('edit_absensi');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user() instanceof User
+            && auth()->user()->hasPermission('edit_absensi');
+    }
 
     public static function form(Form $form): Form
     {

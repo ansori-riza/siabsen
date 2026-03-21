@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -35,8 +38,9 @@ class User extends Authenticatable
     // Role constants
     const ROLE_SUPER_ADMIN = 'super_admin';
     const ROLE_OPERATOR = 'operator';
-    const ROLE_WALI_KELAS = 'wali_kelas';
-    const ROLE_KEPALA_SEKOLAH = 'kepala_sekolah';
+    const ROLE_PEMBINA = 'pembina';
+    const ROLE_PENGELOLA = 'pengelola';
+    const ROLE_PIMPINAN = 'pimpinan';
 
     public function sekolah(): BelongsTo
     {
@@ -60,22 +64,47 @@ class User extends Authenticatable
 
     public function isSuperAdmin(): bool
     {
-        return $this->role === self::ROLE_SUPER_ADMIN;
+        return $this->normalizedRole() === self::ROLE_SUPER_ADMIN;
     }
 
     public function isOperator(): bool
     {
-        return $this->role === self::ROLE_OPERATOR;
+        return $this->normalizedRole() === self::ROLE_OPERATOR;
     }
 
     public function isWaliKelas(): bool
     {
-        return $this->role === self::ROLE_WALI_KELAS;
+        return $this->normalizedRole() === self::ROLE_PEMBINA;
     }
 
     public function isKepalaSekolah(): bool
     {
-        return $this->role === self::ROLE_KEPALA_SEKOLAH;
+        return $this->normalizedRole() === self::ROLE_PIMPINAN;
+    }
+
+    public function normalizedRole(): ?string
+    {
+        return UserRole::fromStoredRole((string) $this->role)?->value;
+    }
+
+    public function roleEnum(): ?UserRole
+    {
+        return UserRole::fromStoredRole((string) $this->role);
+    }
+
+    public function permissions(): array
+    {
+        return $this->roleEnum()?->permissions() ?? [];
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return in_array($permission, $this->permissions(), true);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->roleEnum() !== null && $this->hasPermission('view_absensi');
     }
 
     public function canAccessSekolah(Sekolah $sekolah): bool
@@ -89,10 +118,6 @@ class User extends Authenticatable
 
     public function canEditAbsensi(): bool
     {
-        return in_array($this->role, [
-            self::ROLE_SUPER_ADMIN,
-            self::ROLE_OPERATOR,
-            self::ROLE_WALI_KELAS,
-        ]);
+        return $this->hasPermission('edit_absensi');
     }
 }
