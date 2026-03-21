@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\JadwalSekolah;
 use App\Models\Perangkat;
+use App\Support\DayOfWeekMapper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -59,17 +60,7 @@ class DeviceController extends Controller
         }
 
         // Ambil jadwal hari ini
-        $hariIndonesia = [
-            'Sunday' => 'Minggu',
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            'Saturday' => 'Sabtu',
-        ];
-
-        $hariIni = $hariIndonesia[now()->format('l')];
+        $hariIni = DayOfWeekMapper::today();
 
         $jadwals = JadwalSekolah::where('hari', $hariIni)
             ->where('is_active', true)

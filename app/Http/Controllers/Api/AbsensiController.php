@@ -8,6 +8,7 @@ use App\Models\Guru;
 use App\Models\JadwalSekolah;
 use App\Models\Murid;
 use App\Models\Perangkat;
+use App\Support\DayOfWeekMapper;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -128,17 +129,7 @@ class AbsensiController extends Controller
         }
 
         // Cari jadwal hari ini
-        $hariIndonesia = [
-            'Sunday' => 'Minggu',
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            'Saturday' => 'Sabtu',
-        ];
-
-        $hariIni = $hariIndonesia[now()->format('l')];
+        $hariIni = DayOfWeekMapper::today();
         $roleTarget = $user instanceof Guru ? 'guru' : 'murid';
 
         $jadwal = JadwalSekolah::where('hari', $hariIni)

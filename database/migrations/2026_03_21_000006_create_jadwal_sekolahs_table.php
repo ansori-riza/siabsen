@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sekolah_id')->constrained('sekolahs')->cascadeOnDelete();
             $table->enum('role_target', ['murid', 'guru']);
-            $table->unsignedTinyInteger('hari'); // 0=Minggu, 1=Senin, ... 6=Sabtu
+            $table->unsignedTinyInteger('hari'); // Standar hari: integer 0-6 (0=Minggu ... 6=Sabtu)
             $table->time('jam_masuk');
             $table->time('jam_pulang');
             $table->unsignedSmallInteger('toleransi_menit')->default(0);

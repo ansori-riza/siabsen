@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Absensi;
 use App\Models\Guru;
 use App\Models\JadwalSekolah;
-use App\Models\Murid;
+use App\Support\DayOfWeekMapper;
 use Illuminate\Support\Carbon;
 
 class AbsensiService
@@ -41,7 +41,7 @@ class AbsensiService
     {
         $role = $user instanceof Guru ? 'guru' : 'murid';
 
-        $jadwal = JadwalSekolah::where('hari', now()->locale('id')->dayName)
+        $jadwal = JadwalSekolah::where('hari', DayOfWeekMapper::today())
             ->where('role_target', $role)
             ->where('is_active', true)
             ->first();
