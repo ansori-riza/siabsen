@@ -15,7 +15,8 @@ return new class extends Migration
             $table->string('nama');
             $table->string('rfid_uid', 20)->unique()->nullable();
             $table->unsignedSmallInteger('fingerprint_id')->unique()->nullable();
-            $table->enum('status', ['pns', 'honor'])->default('honor');
+            $table->enum('employment_type', ['tetap', 'tidak_tetap', 'kontrak', 'part_time', 'lainnya'])->default('tidak_tetap');
+            $table->string('employment_detail')->nullable();
             $table->string('jabatan')->nullable();
             $table->string('hp', 20)->nullable();
             $table->string('email')->nullable();
