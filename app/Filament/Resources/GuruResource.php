@@ -40,7 +40,7 @@ class GuruResource extends Resource
                                 'tetap' => 'Tetap',
                                 'tidak_tetap' => 'Tidak Tetap',
                                 'kontrak' => 'Kontrak',
-                                'part_time' => 'Part Time',
+                                'part_time' => 'Part-time',
                                 'lainnya' => 'Lainnya',
                             ])
                             ->default('tidak_tetap')
@@ -48,6 +48,7 @@ class GuruResource extends Resource
                         Forms\Components\TextInput::make('employment_detail')
                             ->label('Detail Kepegawaian')
                             ->placeholder('Contoh: Ustadz Tetap, Guru Pondok, Guru Yayasan')
+                            ->helperText('Opsional: boleh diisi seperti “Ustadz Tetap”, “Musyrif”, “Pengasuh”, dst.')
                             ->maxLength(255),
                     ])->columns(2),
 
@@ -101,6 +102,24 @@ class GuruResource extends Resource
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jabatan'),
+                Tables\Columns\TextColumn::make('employment_type')
+                    ->label('Kepegawaian')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'tetap' => 'Tetap',
+                        'tidak_tetap' => 'Tidak Tetap',
+                        'kontrak' => 'Kontrak',
+                        'part_time' => 'Part-time',
+                        'lainnya' => 'Lainnya',
+                        default => '-',
+                    })
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'tetap' => 'success',
+                        'kontrak' => 'info',
+                        'part_time' => 'warning',
+                        'lainnya' => 'gray',
+                        default => 'primary',
+                    }),
                 Tables\Columns\TextColumn::make('rfid_uid')
                     ->label('RFID')
                     ->badge()
@@ -113,6 +132,15 @@ class GuruResource extends Resource
                     ->boolean(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('employment_type')
+                    ->label('Kepegawaian')
+                    ->options([
+                        'tetap' => 'Tetap',
+                        'tidak_tetap' => 'Tidak Tetap',
+                        'kontrak' => 'Kontrak',
+                        'part_time' => 'Part-time',
+                        'lainnya' => 'Lainnya',
+                    ]),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Status Aktif'),
                 Tables\Filters\Filter::make('belum_enroll')
