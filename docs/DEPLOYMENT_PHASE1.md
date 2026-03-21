@@ -15,6 +15,7 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 
 - [ ] Masuk ke server produksi dengan user/deployment account yang sesuai.
 - [ ] Jalankan `git pull` pada branch/tag rilis yang sudah disetujui.
+- [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` sudah diset agar fase build memakai Node.js 22 dan tidak memunculkan warning kompatibilitas Vite.
 - [ ] Jalankan `composer install --no-dev --optimize-autoloader`.
 - [ ] Jalankan `npm ci && npm run build`.
 - [ ] Jalankan `php artisan migrate --force`.
@@ -22,6 +23,19 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 - [ ] Jalankan optimasi cache Laravel (`php artisan optimize`, `php artisan config:cache`, `php artisan route:cache`, `php artisan view:cache` sesuai kebutuhan aplikasi).
 - [ ] Restart service aplikasi (PHP-FPM, web server, queue worker, dan process manager terkait) sesuai standar environment.
 - [ ] Verifikasi log aplikasi dan log web server tidak menunjukkan error kritikal pasca restart.
+
+### Catatan Deployment Railway
+
+Untuk mencegah kegagalan build front-end di Railway:
+
+1. Buka project **SiAbsen** → service **`web`**.
+2. Masuk ke tab **Variables**.
+3. Tambahkan variabel:
+   - **Key**: `NIXPACKS_NODE_VERSION`
+   - **Value**: `22`
+4. Simpan, lalu trigger **Redeploy**.
+5. Verifikasi di log fase `npm run build` bahwa pesan berikut **tidak muncul lagi**:
+   - `Vite requires Node.js version 20.19+ or 22+`
 
 ## Post-Deploy Smoke Test
 
