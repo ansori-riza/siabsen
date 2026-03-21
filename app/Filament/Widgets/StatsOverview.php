@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Absensi;
 use App\Models\Guru;
 use App\Models\Murid;
+use App\Models\Perangkat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -12,48 +13,60 @@ class StatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
+        // Hitung untuk hari ini
         $today = now()->toDateString();
 
-        $muridHadir = Absensi::where('subject_type', 'App\Models\Murid')
+        // Murid
+        $muridHadir = Absensi::whereDate('waktu_absen', $today)
+            ->where('subject_type', 'App\Models\Murid')
             ->whereIn('status', ['hadir', 'terlambat'])
-            ->whereDate('waktu_absen', $today)
-            ->where('tipe', 'masuk')
             ->count();
 
-        $muridAlpha = Absensi::where('subject_type', 'App\Models\Murid')
+        $muridAlpha = Absensi::whereDate('waktu_absen', $today)
+            ->where('subject_type', 'App\Models\Murid')
             ->where('status', 'alpha')
-            ->whereDate('waktu_absen', $today)
-            ->where('tipe', 'masuk')
             ->count();
 
-        $totalMurid = Murid::where('is_active', true)->count();
+        $muridTerlambat = Absensi::whereDate('waktu_absen', $today)
+            ->where('subject_type', 'App\Models\Murid')
+            ->where('status', 'terlambat')
+            ->count();
 
-        $guruHadir = Absensi::where('subject_type', 'App\Models\Guru')
+        // Guru
+        $guruHadir = Absensi::whereDate('waktu_absen', $today)
+            ->where('subject_type', 'App\Models\Guru')
             ->whereIn('status', ['hadir', 'terlambat'])
-            ->whereDate('waktu_absen', $today)
-            ->where('tipe', 'masuk')
             ->count();
 
-        $guruAlpha = Absensi::where('subject_type', 'App\Models\Guru')
+        $guruAlpha = Absensi::whereDate('waktu_absen', $today)
+            ->where('subject_type', 'App\Models\Guru')
             ->where('status', 'alpha')
-            ->whereDate('waktu_absen', $today)
-            ->where('tipe', 'masuk')
             ->count();
 
-        $totalGuru = Guru::where('is_active', true)->count();
+        // Device
+        $deviceOnline = Perangkat::where('status', 'online')->count();
+        $deviceOffline = Perangkat::where('status', 'offline')->count();
 
         return [
             Stat::make('Murid Hadir', $muridHadir)
-                ->description("{$muridAlpha} Alpha dari {$totalMurid} murid")
-                ->color($muridHadir > 0 ? 'success' : 'danger'),
+                ->description("Terlambat: {$muridTerlambat}")
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('success'),
+
+            Stat::make('Murid Tidak Hadir', $muridAlpha)
+                ->description('Alpha/Izin')
+                ->descriptionIcon('heroicon-m-x-circle')
+                ->color('danger'),
 
             Stat::make('Guru Hadir', $guruHadir)
-                ->description("{$guruAlpha} Alpha dari {$totalGuru} guru")
-                ->color($guruHadir > 0 ? 'success' : 'warning'),
+                ->description("Tidak Hadir: {$guruAlpha}")
+                ->descriptionIcon('heroicon-m-user-group')
+                ->color('success'),
 
-            Stat::make('Total Kehadiran', $muridHadir + $guruHadir)
-                ->description('Hari ini')
-                ->color('primary'),
+            Stat::make('Device Online', $deviceOnline)
+                ->description("Offline: {$deviceOffline}")
+                ->descriptionIcon('heroicon-m-wifi')
+                ->color($deviceOffline > 0 ? 'warning' : 'success'),
         ];
     }
 }
