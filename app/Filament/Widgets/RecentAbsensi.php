@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Absensi;
+use App\Models\Sekolah;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -31,7 +32,7 @@ class RecentAbsensi extends BaseWidget
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label('Sebagai')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? 'Guru' : 'Murid')
+                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getEducatorLabel() : 'Murid')
                     ->color(fn (string $state): string => $state === 'App\Models\Guru' ? 'success' : 'info'),
                 Tables\Columns\TextColumn::make('tipe')
                     ->label('Tipe')

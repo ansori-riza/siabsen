@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\JadwalSekolahResource\Pages;
 use App\Models\JadwalSekolah;
+use App\Models\Sekolah;
 use App\Support\DayOfWeekMapper;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -28,7 +29,7 @@ class JadwalSekolahResource extends Resource
                     ->label('Untuk')
                     ->options([
                         'murid' => 'Murid',
-                        'guru' => 'Guru',
+                        'guru' => Sekolah::getEducatorLabel(),
                     ])
                     ->required()
                     ->default('murid'),
@@ -65,6 +66,7 @@ class JadwalSekolahResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('role_target')
                     ->label('Untuk')
+                    ->formatStateUsing(fn (string $state): string => $state === 'guru' ? Sekolah::getEducatorLabel() : 'Murid')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'murid' => 'info',
@@ -93,7 +95,7 @@ class JadwalSekolahResource extends Resource
                     ->label('Untuk')
                     ->options([
                         'murid' => 'Murid',
-                        'guru' => 'Guru',
+                        'guru' => Sekolah::getEducatorLabel(),
                     ]),
                 Tables\Filters\SelectFilter::make('hari')
                     ->label('Hari')
