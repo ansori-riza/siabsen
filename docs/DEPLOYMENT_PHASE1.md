@@ -16,7 +16,7 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 - [ ] Masuk ke server produksi dengan user/deployment account yang sesuai.
 - [ ] Jalankan `git pull` pada branch/tag rilis yang sudah disetujui.
 - [ ] Verifikasi `railway.json` pada branch rilis: `deploy.startCommand` saat ini fokus pada cache/warmup + `php artisan serve` dan **belum** menjalankan `php artisan migrate --force` otomatis.
-- [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` dan `NPM_CONFIG_OPTIONAL=false` sudah diset agar fase build memakai Node.js 22 sekaligus menghindari error optional dependency npm pada native binding.
+- [ ] **Railway (service `siabsen`)**: pastikan environment variable `RAILWAY_DOCKERFILE_PATH=Dockerfile` sudah diset dan variabel khusus Railpack/Nixpacks yang tidak dipakai sudah dihapus agar konfigurasi build tidak rancu.
 - [ ] **Railway (APP_URL)**: jika `RAILWAY_STATIC_URL` tidak tersedia, isi `APP_URL` secara eksplisit dengan domain aktif service (`https://<service>.up.railway.app`) agar URL absolut, redirect, dan cookie tetap konsisten.
 - [ ] Jalankan `composer install --no-dev --optimize-autoloader`.
 - [ ] Jalankan `npm ci && npm run build`.
@@ -38,40 +38,21 @@ Untuk mencegah data duplikat, seed **tidak** dijalankan otomatis pada setiap dep
   - `php artisan db:seed --class=NamaSeeder --force`
 - Dokumentasikan setiap eksekusi seed di log rilis/deployment notes (siapa, kapan, seeder apa, dampaknya).
 
-### Catatan Deployment Railway
+### Catatan Deployment Railway (Dockerfile)
 
-Untuk mencegah kegagalan build front-end di Railway:
+Untuk memastikan Railway membangun image dari `Dockerfile` repository:
 
-1. Buka project **SiAbsen** → service **`web`**.
+1. Buka project **SiAbsen** → service **`siabsen`**.
 2. Masuk ke tab **Variables**.
-3. Tambahkan variabel berikut:
-   - **Key**: `NIXPACKS_NODE_VERSION`
-   - **Value**: `22`
-   - **Key**: `NPM_CONFIG_OPTIONAL`
-   - **Value**: `false`
+3. Tambahkan/ubah variabel berikut:
+   - **Key**: `RAILWAY_DOCKERFILE_PATH`
+   - **Value**: `Dockerfile`
    - **Key**: `APP_URL`
-   - **Value**: `https://<service>.up.railway.app` (gunakan domain aktif service `web`; jangan kosong)
-4. Simpan, lalu trigger **Redeploy** service `web`.
-5. Verifikasi di log fase `npm ci`/`npm run build` bahwa pesan berikut **tidak muncul lagi**:
-   - `Vite requires Node.js version 20.19+ or 22+`
-   - `Cannot find native binding ... optional dependencies`
-6. Jika pesan optional dependency masih muncul, copy **30 baris awal error terbaru** dari build log untuk tindak lanjut insiden.
-7. Simpan hasil verifikasi ke bukti operasional (contoh: `docs/evidence/railway-optional-deps-followup-2026-03-21.md`).
-
-
-### Troubleshooting: npm Optional Dependencies (Railway)
-
-Jika setelah redeploy masih muncul error seperti `Cannot find native binding ... optional dependencies`, lakukan langkah berikut:
-
-1. Pastikan di **Railway → service `web` → Variables** sudah ada `NPM_CONFIG_OPTIONAL=false` (huruf kecil `false`).
-2. Trigger **Redeploy** ulang dan pantau log build pada tahap `npm ci`.
-3. Jika error tetap muncul, lakukan fallback clean install dependency di build environment Railway dengan menambahkan langkah berikut sebelum `npm run build`:
-   - `rm -rf node_modules package-lock.json`
-   - `npm cache clean --force`
-   - `npm install --include=optional`
-   - `npm run build`
-4. Jika build berhasil dengan fallback di atas, commit lockfile terbaru (jika berubah), lalu redeploy lagi menggunakan `npm ci` agar instalasi kembali deterministik.
-5. Dokumentasikan insiden dan simpan potongan log sebelum/sesudah mitigasi untuk kebutuhan audit deployment.
+   - **Value**: `https://<service>.up.railway.app` (gunakan domain aktif service `siabsen`; jangan kosong)
+4. Hapus variabel lama yang khusus untuk Railpack/Nixpacks (contoh `NIXPACKS_NODE_VERSION`, `NPM_CONFIG_OPTIONAL`) jika sudah tidak digunakan.
+5. Simpan perubahan, lalu trigger **Redeploy** service `siabsen`.
+6. Verifikasi build log menampilkan instalasi extension PHP dari Dockerfile, terutama baris `docker-php-ext-install intl zip ...`.
+7. Simpan hasil verifikasi ke bukti operasional (contoh: `docs/evidence/railway-dockerfile-redeploy-2026-03-21.md`).
 
 ## Post-Deploy Smoke Test
 
