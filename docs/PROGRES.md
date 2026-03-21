@@ -209,6 +209,15 @@ public function subject(): MorphTo {
 
 ---
 
+## ✅ CHECKLIST OPERASIONAL HARIAN
+
+- [ ] Tetapkan PIC teknis yang standby pada jam masuk dan jam pulang.
+- [ ] Catat insiden harian (device offline, data tidak masuk, user error input).
+- [ ] Tetapkan SLA respon cepat untuk isu operasional (target maksimal 30 menit).
+- [ ] Lakukan review harian singkat dan patch minor bila ditemukan bottleneck.
+
+---
+
 ## 🚀 NEXT STEPS (Phase 2)
 
 ### ESP32 Hardware (Belum Mulai)
