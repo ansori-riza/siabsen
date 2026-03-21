@@ -11,7 +11,7 @@ class Guru extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
         'sekolah_id', 'nip', 'nama', 'rfid_uid', 'fingerprint_id',
-        'status', 'jabatan', 'hp', 'email', 'foto', 'is_active'
+        'employment_type', 'employment_detail', 'jabatan', 'hp', 'email', 'foto', 'is_active'
     ];
     protected $casts = ['fingerprint_id' => 'integer'];
     public function sekolah(): BelongsTo { return $this->belongsTo(Sekolah::class); }

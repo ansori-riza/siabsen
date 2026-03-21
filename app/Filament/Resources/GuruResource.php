@@ -34,12 +34,21 @@ class GuruResource extends Resource
                             ->maxLength(255),
                         Forms\Components\TextInput::make('jabatan')
                             ->maxLength(100),
-                        Forms\Components\Select::make('status')
+                        Forms\Components\Select::make('employment_type')
+                            ->label('Jenis Kepegawaian')
                             ->options([
-                                'pns' => 'PNS',
-                                'honor' => 'Honorer',
+                                'tetap' => 'Tetap',
+                                'tidak_tetap' => 'Tidak Tetap',
+                                'kontrak' => 'Kontrak',
+                                'part_time' => 'Part Time',
+                                'lainnya' => 'Lainnya',
                             ])
-                            ->default('honor'),
+                            ->default('tidak_tetap')
+                            ->required(),
+                        Forms\Components\TextInput::make('employment_detail')
+                            ->label('Detail Kepegawaian')
+                            ->placeholder('Contoh: Ustadz Tetap, Guru Pondok, Guru Yayasan')
+                            ->maxLength(255),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Kartu & Biometrik')
