@@ -167,16 +167,16 @@ class GuruResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return Sekolah::getEducatorLabel();
+        return Sekolah::getGuruLabel();
     }
 
     public static function getModelLabel(): string
     {
-        return Sekolah::getEducatorLabel();
+        return Sekolah::getGuruLabel();
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Daftar ' . Sekolah::getEducatorLabel();
+        return 'Daftar ' . Sekolah::getGuruLabel();
     }
 }

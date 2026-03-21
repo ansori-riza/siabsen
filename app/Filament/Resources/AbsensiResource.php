@@ -74,7 +74,7 @@ class AbsensiResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label('Sebagai')
-                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getEducatorLabel() : 'Murid')
+                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getGuruLabel() : Sekolah::getStudentLabel())
                     ->badge()
                     ->color(fn (string $state): string => $state === 'App\Models\Guru' ? 'success' : 'info'),
                 Tables\Columns\TextColumn::make('tipe')
@@ -134,6 +134,12 @@ class AbsensiResource extends Resource
                     ->options([
                         'masuk' => 'Masuk',
                         'pulang' => 'Pulang',
+                    ]),
+                Tables\Filters\SelectFilter::make('subject_type')
+                    ->label('Sebagai')
+                    ->options([
+                        'App\Models\Guru' => Sekolah::getGuruLabel(),
+                        'App\Models\Murid' => Sekolah::getStudentLabel(),
                     ]),
                 Tables\Filters\SelectFilter::make('metode')
                     ->label('Metode')

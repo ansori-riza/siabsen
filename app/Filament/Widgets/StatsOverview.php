@@ -47,17 +47,17 @@ class StatsOverview extends BaseWidget
         $deviceOffline = Perangkat::where('status', 'offline')->count();
 
         return [
-            Stat::make('Murid Hadir', $muridHadir)
+            Stat::make(Sekolah::getStudentLabel() . ' Hadir', $muridHadir)
                 ->description("Terlambat: {$muridTerlambat}")
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('success'),
 
-            Stat::make('Murid Tidak Hadir', $muridAlpha)
+            Stat::make(Sekolah::getStudentLabel() . ' Tidak Hadir', $muridAlpha)
                 ->description('Alpha/Izin')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
 
-            Stat::make(Sekolah::getEducatorLabel() . ' Hadir', $guruHadir)
+            Stat::make(Sekolah::getGuruLabel() . ' Hadir', $guruHadir)
                 ->description("Tidak Hadir: {$guruAlpha}")
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
