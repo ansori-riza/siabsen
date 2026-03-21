@@ -142,9 +142,9 @@ class PerangkatResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPerangkats::class,
-            'create' => Pages\CreatePerangkat::class,
-            'edit' => Pages\EditPerangkat::class,
+            'index' => Pages\ListPerangkats::route('/'),
+            'create' => Pages\CreatePerangkat::route('/create'),
+            'edit' => Pages\EditPerangkat::route('/{record}/edit'),
         ];
     }
 }
