@@ -1,74 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SiAbsen — Sistem Absensi Sekolah/Pondok (RFID + Fingerprint)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SiAbsen adalah aplikasi absensi sekolah/pondok berbasis Laravel untuk mencatat kehadiran murid dan guru secara digital melalui perangkat hardware (RFID + fingerprint), dengan monitoring terpusat lewat admin panel.
 
-## About Laravel
+## Fitur Utama Phase 1
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Admin panel (Filament)** untuk manajemen master data sekolah, guru, murid, kelas, jadwal, perangkat, dan absensi.
+- **API device** untuk menerima event absensi dari perangkat (ESP32/vendor adapter) dengan autentikasi `X-Device-Key`.
+- **Manajemen jadwal** masuk/pulang murid & guru beserta toleransi keterlambatan.
+- **Monitoring absensi** real-time + input/manual correction dengan jejak audit.
+- **Role user** berbasis kebutuhan operasional sekolah (`super_admin`, `operator`, `wali_kelas`, `kepala_sekolah`).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Arsitektur Singkat
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Alur sistem inti:
 
-## Learning Laravel
+1. **Aplikasi Laravel (core platform)**
+   - Menyediakan panel admin, API, logic status kehadiran, laporan, dan scheduler.
+2. **Perangkat absensi**
+   - ESP32 custom atau device vendor via **middleware adapter** untuk standarisasi payload/event.
+3. **Database**
+   - Menyimpan data master, jadwal, event absensi, izin, perangkat, dan audit log.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Skema sederhana:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+`Device (RFID/Fingerprint) -> API Laravel -> Service/Rule Engine -> Database -> Dashboard/Reporting`
 
-## Laravel Sponsors
+## Dokumentasi Terkait
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## Integrasi Hardware
-
-Untuk integrasi perangkat absensi (ESP32, RFID, fingerprint), lihat dokumentasi API hardware berikut:
-
-- [API Hardware Integration](docs/API_HARDWARE.md)
+- [Product Requirement Document (PRD)](docs/PRD.md)
+- [Progress Implementasi](docs/PROGRES.md)
+- [API Hardware](docs/API_HARDWARE.md)
 - [Hardware Compatibility](docs/HARDWARE_COMPATIBILITY.md)
-
-Dokumen API mencakup endpoint, header wajib `X-Device-Key`, format payload RFID/fingerprint, pola response, strategi retry, dan baseline keamanan publik.
-
-## Deployment / Operasional
-
-Untuk panduan implementasi lapangan Phase 1, gunakan checklist berikut:
-
+- [Runbook Hardware Onboarding](docs/RUNBOOK_HARDWARE_ONBOARDING.md)
 - [Deployment Checklist Phase 1](docs/DEPLOYMENT_PHASE1.md)
+
+## Quick Start (Local Development)
+
+> Contoh berikut asumsi environment lokal Linux/macOS + PHP + Composer + Node.js tersedia.
+
+1. **Install dependency**
+
+   ```bash
+   composer install
+   npm install
+   ```
+
+2. **Setup `.env`**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+3. **Migrasi + seed data awal**
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+4. **Build asset + jalankan app**
+
+   ```bash
+   npm run dev
+   php artisan serve
+   ```
+
+5. **(Opsional) Jalankan queue worker & scheduler loop di lokal**
+
+   ```bash
+   php artisan queue:work
+   php artisan schedule:work
+   ```
+
+## Konfigurasi Penting
+
+Pastikan variabel berikut benar sebelum onboarding device atau go-live:
+
+- **APP URL**
+  - `APP_URL` harus sesuai domain/aplikasi yang diakses user.
+- **Database**
+  - `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
+- **Timezone**
+  - Set `APP_TIMEZONE` (dan timezone server) agar status hadir/terlambat akurat.
+- **Queue & Scheduler**
+  - Tentukan `QUEUE_CONNECTION`.
+  - Pastikan worker queue aktif untuk job background.
+  - Pastikan scheduler aktif untuk task terjadwal (termasuk proses otomatis terkait absensi).
+
+## API Ringkas untuk Hardware
+
+Base path API: `/api`
+
+- **POST** `/api/absensi`
+  - Header wajib: `X-Device-Key: <device_key>`
+  - Payload minimal:
+    - `tipe`: `masuk` / `pulang`
+    - salah satu identitas: `rfid_uid` **atau** `fingerprint_id`
+- **POST** `/api/perangkat/heartbeat`
+  - Update status/last seen perangkat.
+- **GET** `/api/perangkat/sync`
+  - Sinkronisasi konfigurasi/data referensi ke perangkat.
+
+Lihat kontrak lengkap, contoh request/response, dan retry strategy di [docs/API_HARDWARE.md](docs/API_HARDWARE.md).
+
+## Role & Akses
+
+Role operasional saat ini:
+
+- **super_admin**: kontrol penuh sistem, pengaturan global, dan user management.
+- **operator**: operasional harian (master data, perangkat, monitoring, koreksi data sesuai kebijakan).
+- **wali_kelas**: pantau absensi kelas binaan, verifikasi/koreksi terbatas, input izin.
+- **kepala_sekolah**: akses dashboard dan laporan monitoring tingkat sekolah.
+
+## Status Implementasi
+
+Ringkasan posisi saat ini:
+
+- **Phase 1 (MVP) — berjalan/aktif dikembangkan**
+  - Fokus: core absensi stabil, admin panel, API device, role-based access, audit, monitoring.
+  - Integrasi device custom (ESP32) dan jalur adapter vendor diposisikan terpisah agar core tetap stabil.
+- **Roadmap berikutnya (Phase 2+)**
+  - Penguatan kanal notifikasi, portal/mobile experience, perluasan skema verifikasi, dan integrasi lanjutan sesuai PRD.
+
+Untuk detail progres terbaru per modul, issue aktif, checklist, dan next steps, lihat [docs/PROGRES.md](docs/PROGRES.md) dan [docs/PRD.md](docs/PRD.md).
+
+## Troubleshooting Umum
+
+### 1) Asset admin panel tidak load / tampilan berantakan
+
+- Verifikasi `APP_URL` dan skema HTTPS/HTTP konsisten.
+- Bersihkan cache aplikasi:
+
+  ```bash
+  php artisan optimize:clear
+  ```
+
+- Build ulang asset frontend:
+
+  ```bash
+  npm run build
+  ```
+
+- Cek reverse proxy/web server agar tidak mengubah host/protocol internal secara salah.
+
+### 2) Auth device gagal (`401` / `Missing X-Device-Key`)
+
+- Pastikan header `X-Device-Key` dikirim di setiap request device.
+- Validasi `device_key` aktif dan cocok dengan data perangkat.
+- Cek environment API target (jangan tertukar antara local/staging/production).
+
+### 3) Scheduler tidak jalan
+
+- Pastikan scheduler process aktif (`php artisan schedule:work`) **atau** cron server menjalankan `php artisan schedule:run` setiap menit.
+- Pastikan timezone server sesuai konfigurasi aplikasi.
+- Cek log aplikasi untuk command yang gagal.
+
+## Kontribusi Tim
+
+### Branching Standard
+
+- `main` -> branch stabil/produksi.
+- Gunakan branch fitur/perbaikan dari `main` dengan pola:
+  - `feature/<nama-fitur>`
+  - `fix/<nama-bug>`
+  - `chore/<nama-pekerjaan>`
+
+Contoh:
+- `feature/api-device-heartbeat`
+- `fix/asset-url-filament`
+
+### Commit Naming Convention
+
+Gunakan gaya commit konsisten (disarankan Conventional Commits):
+
+- `feat: tambah endpoint heartbeat perangkat`
+- `fix: validasi header x-device-key`
+- `docs: update runbook onboarding hardware`
+- `chore: rapikan konfigurasi scheduler`
+
+### Alur Pull Request (PR)
+
+1. Buat branch dari `main`.
+2. Implementasi perubahan + update dokumentasi terkait.
+3. Jalankan pengujian/check lokal.
+4. Push branch dan buka PR.
+5. Isi deskripsi PR minimal: tujuan, scope, cara uji, risiko.
+6. Minta review minimal 1 reviewer tim.
+7. Merge setelah approval dan seluruh check wajib lulus.
