@@ -122,9 +122,9 @@ class JadwalSekolahResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListJadwalSekolahs::class,
-            'create' => Pages\CreateJadwalSekolah::class,
-            'edit' => Pages\EditJadwalSekolah::class,
+            'index' => Pages\ListJadwalSekolahs::route('/'),
+            'create' => Pages\CreateJadwalSekolah::route('/create'),
+            'edit' => Pages\EditJadwalSekolah::route('/{record}/edit'),
         ];
     }
 }

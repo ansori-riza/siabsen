@@ -157,9 +157,9 @@ class MuridResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMurids::class,
-            'create' => Pages\CreateMurid::class,
-            'edit' => Pages\EditMurid::class,
+            'index' => Pages\ListMurids::route('/'),
+            'create' => Pages\CreateMurid::route('/create'),
+            'edit' => Pages\EditMurid::route('/{record}/edit'),
         ];
     }
 

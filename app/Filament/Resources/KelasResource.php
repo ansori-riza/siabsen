@@ -108,9 +108,9 @@ class KelasResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListKelas::class,
-            'create' => Pages\CreateKelas::class,
-            'edit' => Pages\EditKelas::class,
+            'index' => Pages\ListKelas::route('/'),
+            'create' => Pages\CreateKelas::route('/create'),
+            'edit' => Pages\EditKelas::route('/{record}/edit'),
         ];
     }
 

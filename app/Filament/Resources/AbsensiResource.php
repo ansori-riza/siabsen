@@ -162,9 +162,9 @@ class AbsensiResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAbsensis::class,
-            'create' => Pages\CreateAbsensi::class,
-            'edit' => Pages\EditAbsensi::class,
+            'index' => Pages\ListAbsensis::route('/'),
+            'create' => Pages\CreateAbsensi::route('/create'),
+            'edit' => Pages\EditAbsensi::route('/{record}/edit'),
         ];
     }
 }

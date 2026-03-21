@@ -89,9 +89,9 @@ class SekolahResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSekolahs::class,
-            'create' => Pages\CreateSekolah::class,
-            'edit' => Pages\EditSekolah::class,
+            'index' => Pages\ListSekolahs::route('/'),
+            'create' => Pages\CreateSekolah::route('/create'),
+            'edit' => Pages\EditSekolah::route('/{record}/edit'),
         ];
     }
 }
