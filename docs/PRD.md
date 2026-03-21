@@ -742,6 +742,27 @@ erDiagram
 
 ## XIII. GLOSSARY
 
+### 13.1 Domain Istilah
+
+- Label/terminologi domain pada UI **tidak hardcoded** di kode sumber.
+- Semua istilah ditentukan melalui **konfigurasi aplikasi** agar bisa disesuaikan per institusi (contoh: Sekolah ↔ Pondok, Murid ↔ Santri, Guru ↔ Ustadz/Ustadzah).
+- Perubahan istilah dilakukan oleh admin saat onboarding/konfigurasi awal tanpa perlu deploy ulang aplikasi.
+
+### 13.2 Konfigurasi untuk Pondok
+
+Field minimum yang harus diset saat onboarding Pondok:
+
+| Field Konfigurasi | Contoh Nilai Pondok | Keterangan |
+|-------------------|---------------------|------------|
+| `institution_type` | `pondok` | Menentukan preset domain lembaga |
+| `label_school` | `Pondok` | Pengganti istilah "Sekolah" |
+| `label_student` | `Santri` | Pengganti istilah "Murid/Siswa" |
+| `label_teacher` | `Ustadz/Ustadzah` | Pengganti istilah "Guru" |
+| `label_class` | `Kelas/Halaqah` | Istilah rombel/kelas belajar |
+| `label_guardian` | `Musyrif/Wali Santri` | Istilah pendamping/wali |
+| `label_attendance_menu` | `Absensi Santri` | Label menu utama absensi |
+| `timezone` | `Asia/Jakarta` | Acuan waktu absensi & scheduler |
+
 | Istilah | Definisi |
 |---------|----------|
 | **Alpha** | Tidak hadir tanpa keterangan |
