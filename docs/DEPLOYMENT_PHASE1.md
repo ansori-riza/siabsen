@@ -55,6 +55,8 @@ Untuk mencegah kegagalan build front-end di Railway:
 5. Verifikasi di log fase `npm ci`/`npm run build` bahwa pesan berikut **tidak muncul lagi**:
    - `Vite requires Node.js version 20.19+ or 22+`
    - `Cannot find native binding ... optional dependencies`
+6. Jika pesan optional dependency masih muncul, copy **30 baris awal error terbaru** dari build log untuk tindak lanjut insiden.
+7. Simpan hasil verifikasi ke bukti operasional (contoh: `docs/evidence/railway-optional-deps-followup-2026-03-21.md`).
 
 
 ### Troubleshooting: npm Optional Dependencies (Railway)
