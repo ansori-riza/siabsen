@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\GuruResource\Pages;
 use App\Models\Guru;
+use App\Models\Sekolah;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,8 +16,6 @@ class GuruResource extends Resource
 {
     protected static ?string $model = Guru::class;
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $navigationLabel = 'Guru';
-    protected static ?string $pluralModelLabel = 'Daftar Guru';
 
     public static function form(Form $form): Form
     {
@@ -164,5 +163,20 @@ class GuruResource extends Resource
             'create' => Pages\CreateGuru::route('/create'),
             'edit' => Pages\EditGuru::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return Sekolah::getEducatorLabel();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return Sekolah::getEducatorLabel();
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Daftar ' . Sekolah::getEducatorLabel();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AbsensiResource\Pages;
 use App\Models\Absensi;
+use App\Models\Sekolah;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -73,7 +74,7 @@ class AbsensiResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('subject_type')
                     ->label('Sebagai')
-                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? 'Guru' : 'Murid')
+                    ->formatStateUsing(fn (string $state): string => $state === 'App\Models\Guru' ? Sekolah::getEducatorLabel() : 'Murid')
                     ->badge()
                     ->color(fn (string $state): string => $state === 'App\Models\Guru' ? 'success' : 'info'),
                 Tables\Columns\TextColumn::make('tipe')

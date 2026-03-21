@@ -34,6 +34,11 @@ class SekolahResource extends Resource
                         Forms\Components\TextInput::make('kepala_sekolah')
                             ->label('Kepala Sekolah')
                             ->maxLength(255),
+                        Forms\Components\Select::make('institution_type')
+                            ->label('Tipe Lembaga')
+                            ->options(Sekolah::institutionTypeOptions())
+                            ->default(Sekolah::INSTITUTION_TYPE_SEKOLAH_UMUM)
+                            ->required(),
                     ]),
                 Forms\Components\Section::make('Pengaturan Tampilan')
                     ->schema([
@@ -60,6 +65,10 @@ class SekolahResource extends Resource
                     ->label('NPSN'),
                 Tables\Columns\TextColumn::make('kepala_sekolah')
                     ->label('Kepala Sekolah'),
+                Tables\Columns\TextColumn::make('institution_type')
+                    ->label('Tipe Lembaga')
+                    ->formatStateUsing(fn (?string $state): string => Sekolah::institutionTypeOptions()[$state] ?? 'Sekolah Umum')
+                    ->badge(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

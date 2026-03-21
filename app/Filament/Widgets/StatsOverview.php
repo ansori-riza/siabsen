@@ -3,9 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Absensi;
-use App\Models\Guru;
-use App\Models\Murid;
 use App\Models\Perangkat;
+use App\Models\Sekolah;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -58,7 +57,7 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
 
-            Stat::make('Guru Hadir', $guruHadir)
+            Stat::make(Sekolah::getEducatorLabel() . ' Hadir', $guruHadir)
                 ->description("Tidak Hadir: {$guruAlpha}")
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
