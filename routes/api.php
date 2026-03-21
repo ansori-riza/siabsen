@@ -14,16 +14,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Device routes (require X-Device-Key header)
-Route::post('/device/heartbeat', [DeviceController::class, 'heartbeat'])
-    ->name('api.device.heartbeat');
+Route::middleware('device.key')->group(function () {
+    // Device routes (require X-Device-Key header)
+    Route::post('/device/heartbeat', [DeviceController::class, 'heartbeat'])
+        ->name('api.device.heartbeat');
 
-Route::get('/device/sync', [DeviceController::class, 'sync'])
-    ->name('api.device.sync');
+    Route::get('/device/sync', [DeviceController::class, 'sync'])
+        ->name('api.device.sync');
 
-// Absensi routes (require X-Device-Key header)
-Route::post('/absensi', [AbsensiController::class, 'store'])
-    ->name('api.absensi.store');
+    // Absensi routes (require X-Device-Key header)
+    Route::post('/absensi', [AbsensiController::class, 'store'])
+        ->name('api.absensi.store');
+});
 
 // Health check
 Route::get('/health', function () {

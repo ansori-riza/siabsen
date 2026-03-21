@@ -12,7 +12,6 @@ use App\Support\DayOfWeekMapper;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AbsensiController extends Controller
 {
@@ -24,15 +23,8 @@ class AbsensiController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Validasi device key
-        $deviceKey = $request->header('X-Device-Key');
-        $perangkat = Perangkat::where('device_key', $deviceKey)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$perangkat) {
-            return $this->errorResponse('Device tidak terdaftar', 401);
-        }
+        /** @var Perangkat $perangkat */
+        $perangkat = $request->attributes->get('perangkat');
 
         // Update status perangkat
         $perangkat->update([
