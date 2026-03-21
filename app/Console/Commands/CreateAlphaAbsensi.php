@@ -48,6 +48,7 @@ class CreateAlphaAbsensi extends Command
                     'tipe' => 'masuk',
                     'status' => 'alpha',
                     'metode' => 'manual',
+                    'source' => 'system',
                     'waktu_absen' => $date->copy()->setTime(0, 0, 1),
                 ]);
                 $createdCount++;
@@ -69,6 +70,7 @@ class CreateAlphaAbsensi extends Command
                     'tipe' => 'masuk',
                     'status' => 'alpha',
                     'metode' => 'manual',
+                    'source' => 'system',
                     'waktu_absen' => $date->copy()->setTime(0, 0, 1),
                 ]);
                 $createdCount++;

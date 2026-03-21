@@ -20,6 +20,7 @@ class Absensi extends Model
         'tipe',
         'status',
         'metode',
+        'source',
         'waktu_absen',
         'keterangan',
         'dinput_oleh',
