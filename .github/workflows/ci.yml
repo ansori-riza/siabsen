@@ -3,13 +3,20 @@ name: CI
 on:
   push:
     branches:
-      - "**"
+      - master
   pull_request:
 
 jobs:
   test-stable:
     name: Test (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
     strategy:
       fail-fast: false
       matrix:
@@ -35,7 +42,13 @@ jobs:
             ${{ runner.os }}-php-${{ matrix.php-version }}-
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Prepare application
+        run: |
+          cp .env.example .env
+          touch database/database.sqlite
+          php artisan key:generate --ansi
 
       - name: Static lint
         run: composer lint:static
@@ -47,6 +60,13 @@ jobs:
     name: Test (PHP 8.5 experimental)
     runs-on: ubuntu-latest
     continue-on-error: true
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
 
     steps:
       - name: Checkout
@@ -68,7 +88,13 @@ jobs:
             ${{ runner.os }}-php-8.5-
 
       - name: Update transitive packages for PHP 8.5
-        run: composer update filament/actions openspout/openspout --with-all-dependencies --no-interaction --no-progress --prefer-dist
+        run: composer update filament/actions openspout/openspout --with-all-dependencies --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Prepare application
+        run: |
+          cp .env.example .env
+          touch database/database.sqlite
+          php artisan key:generate --ansi
 
       - name: Static lint
         run: composer lint:static
