@@ -181,6 +181,14 @@ public function subject(): MorphTo {
 
 ## 📋 PHASE 1 CHECKLIST
 
+### Milestone Phase 1 (Updated)
+- [x] Stream **Core Absensi Stabil** dipisahkan dari stream adapter vendor
+- [x] Stream **Adapter Vendor** ditetapkan sebagai jalur delivery terpisah
+- [x] Vendor prioritas pertama: **Solution / ZKTeco ecosystem**
+- [x] Deliverable Core: endpoint stabil, auth, audit, dashboard
+- [x] Deliverable Adapter: connector, mapping event, retry queue, monitoring
+- [x] Acceptance criteria per stream didefinisikan di `docs/PRD.md` (Section X)
+
 ### Core Functionality
 - [x] Database schema lengkap
 - [x] Models dengan relasi

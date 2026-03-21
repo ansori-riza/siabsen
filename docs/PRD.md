@@ -697,6 +697,52 @@ erDiagram
 
 ## X. ACCEPTANCE CRITERIA — Go-Live Phase 1
 
+### 10.1 Milestone Reframing Phase 1
+
+Phase 1 ditetapkan ulang menjadi dua stream paralel agar core absensi tetap stabil, sementara integrasi vendor berjalan di jalur terpisah:
+
+1. **Stream Core Absensi Stabil**
+   - Fokus pada kestabilan domain inti absensi, keamanan akses, keterlacakan perubahan, dan visibilitas operasional.
+2. **Stream Adapter Vendor (Terpisah)**
+   - Fokus pada konektivitas perangkat/vendor eksternal, normalisasi event ke format internal, dan keandalan sinkronisasi.
+
+**Vendor prioritas pertama untuk stream Adapter:**
+- **Solution / ZKTeco ecosystem** (terminal fingerprint/RFID dan protokol terkait) sebagai target integrasi awal.
+
+### 10.2 Deliverable per Stream (Phase 1)
+
+#### A. Stream Core Absensi Stabil
+
+- Endpoint absensi stabil untuk alur masuk/pulang.
+- Mekanisme auth yang konsisten untuk seluruh endpoint operasional.
+- Audit trail untuk setiap perubahan data penting absensi.
+- Dashboard operasional untuk monitoring status harian.
+
+#### B. Stream Adapter Vendor (Solution/ZKTeco)
+
+- Connector ke perangkat/vendor prioritas.
+- Mapping event vendor → event absensi internal.
+- Retry queue untuk event yang gagal diproses/sinkron.
+- Monitoring adapter (status koneksi, antrian, error rate).
+
+### 10.3 Acceptance Criteria per Stream
+
+#### A. Acceptance Criteria — Stream Core Absensi Stabil
+
+- [ ] Endpoint absensi core tersedia dan lolos uji kontrak API untuk skenario masuk/pulang.
+- [ ] Auth endpoint tervalidasi: request tanpa kredensial valid ditolak, request valid diproses benar.
+- [ ] Audit log tercatat untuk create/update/koreksi absensi, termasuk actor dan timestamp.
+- [ ] Dashboard menampilkan metrik operasional utama (hadir, terlambat, alpha, perangkat aktif) dengan data yang konsisten terhadap database.
+- [ ] Skenario operasional harian dapat berjalan tanpa ketergantungan langsung ke adapter vendor tertentu.
+
+#### B. Acceptance Criteria — Stream Adapter Vendor (Solution/ZKTeco)
+
+- [ ] Connector Solution/ZKTeco dapat terhubung dan mengambil event kehadiran dari minimal 1 perangkat uji.
+- [ ] Mapping event tervalidasi: event vendor dapat dikonversi ke format internal (subject, waktu, metode, status) tanpa kehilangan field wajib.
+- [ ] Retry queue berjalan untuk event gagal: event masuk antrean, diproses ulang otomatis, dan memiliki batas retry + penandaan gagal permanen.
+- [ ] Monitoring adapter tersedia: status koneksi, jumlah antrean, retry count, dan error terbaru dapat dipantau tim operasional.
+- [ ] Kegagalan adapter tidak menghentikan layanan core absensi; core tetap melayani endpoint internal secara normal.
+
 - [ ] Murid tap RFID → tercatat Hadir/Terlambat/Alpha sesuai jadwal
 - [ ] Guru tap RFID → tercatat Hadir/Terlambat/Alpha sesuai jadwal guru
 - [ ] Guru tap Fingerprint → tercatat dengan metode "fingerprint"
