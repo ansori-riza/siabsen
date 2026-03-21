@@ -155,6 +155,18 @@ Untuk detail progres terbaru per modul, issue aktif, checklist, dan next steps, 
 - Pastikan timezone server sesuai konfigurasi aplikasi.
 - Cek log aplikasi untuk command yang gagal.
 
+## Catatan Operasional Deploy Produksi
+
+- `railway.json` saat ini belum memasukkan migrate otomatis pada `deploy.startCommand`; migrasi tetap dijalankan sebagai langkah operasional terpisah.
+- Urutan minimum setelah release:
+  1. `php artisan migrate --force`
+  2. Verifikasi `GET /up` mengembalikan `200 OK`
+  3. Verifikasi login panel admin berhasil
+  4. Jalankan seed bila diperlukan sesuai kebijakan
+- Kebijakan seed:
+  - **First deploy**: boleh menjalankan `php artisan db:seed --force` untuk bootstrap data awal.
+  - **Deploy rutin**: hindari seed global untuk mencegah duplikasi; gunakan seeder idempotent/seeder spesifik bila ada kebutuhan data baru.
+
 ## Kontribusi Tim
 
 ### Branching Standard
