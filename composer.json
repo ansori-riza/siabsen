@@ -3,7 +3,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -47,6 +50,7 @@
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
         "test": [
+            "@composer lint:static",
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
@@ -68,6 +72,9 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "lint:static": [
+            "@php -r 'foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\"app\")) as $file) { if ($file->isFile() && $file->getExtension()===\"php\") { passthru(\"php -l \".escapeshellarg($file->getPathname()), $code); if ($code !== 0) { exit($code); } } }'"
         ]
     },
     "extra": {
