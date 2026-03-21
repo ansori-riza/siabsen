@@ -1,0 +1,39 @@
+# Laravel
+/vendor/
+/node_modules/
+/.env
+/.env.backup
+/.env.production
+/.phpunit.cache
+/storage/*.key
+/storage/pail/*
+/bootstrap/cache/
+/public/hot
+/public/storage
+/puphpeteer/*
+/build/*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled
+*.cache
+*.log
+*.pid
+
+# Composer
+composer.phar
+
+# Misc
+*.bak
+*.tmp
+/.sqlite
+/database.sqlite
