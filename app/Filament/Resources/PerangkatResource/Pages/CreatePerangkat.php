@@ -4,7 +4,6 @@ namespace App\Filament\Resources\PerangkatResource\Pages;
 
 use App\Filament\Resources\PerangkatResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Models\Perangkat;
 
 class CreatePerangkat extends CreateRecord
 {
@@ -12,7 +11,7 @@ class CreatePerangkat extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['device_key'] = Perangkat::generateDeviceKey();
+        $data['device_key'] = \App\Models\Perangkat::generateDeviceKey();
         return $data;
     }
 }

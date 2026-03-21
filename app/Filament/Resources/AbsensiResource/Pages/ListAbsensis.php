@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\AbsensiResource\Pages;
 
 use App\Filament\Resources\AbsensiResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAbsensis extends ListRecords
@@ -12,8 +11,6 @@ class ListAbsensis extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make()->label('Input Manual'),
-        ];
+        return [];
     }
 }
