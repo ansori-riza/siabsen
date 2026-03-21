@@ -45,6 +45,11 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
 
+      - name: Prepare writable directories
+        run: |
+          mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
+          chmod -R ug+rwX bootstrap/cache storage
+
       - name: Prepare application
         run: |
           cp .env.example .env
