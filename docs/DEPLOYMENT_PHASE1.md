@@ -15,7 +15,7 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 
 - [ ] Masuk ke server produksi dengan user/deployment account yang sesuai.
 - [ ] Jalankan `git pull` pada branch/tag rilis yang sudah disetujui.
-- [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` sudah diset agar fase build memakai Node.js 22 dan tidak memunculkan warning kompatibilitas Vite.
+- [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` dan `NPM_CONFIG_OPTIONAL=false` sudah diset agar fase build memakai Node.js 22 sekaligus menghindari error optional dependency npm pada native binding.
 - [ ] Jalankan `composer install --no-dev --optimize-autoloader`.
 - [ ] Jalankan `npm ci && npm run build`.
 - [ ] Jalankan `php artisan migrate --force`.
@@ -30,12 +30,30 @@ Untuk mencegah kegagalan build front-end di Railway:
 
 1. Buka project **SiAbsen** → service **`web`**.
 2. Masuk ke tab **Variables**.
-3. Tambahkan variabel:
+3. Tambahkan variabel berikut:
    - **Key**: `NIXPACKS_NODE_VERSION`
    - **Value**: `22`
-4. Simpan, lalu trigger **Redeploy**.
-5. Verifikasi di log fase `npm run build` bahwa pesan berikut **tidak muncul lagi**:
+   - **Key**: `NPM_CONFIG_OPTIONAL`
+   - **Value**: `false`
+4. Simpan, lalu trigger **Redeploy** service `web`.
+5. Verifikasi di log fase `npm ci`/`npm run build` bahwa pesan berikut **tidak muncul lagi**:
    - `Vite requires Node.js version 20.19+ or 22+`
+   - `Cannot find native binding ... optional dependencies`
+
+
+### Troubleshooting: npm Optional Dependencies (Railway)
+
+Jika setelah redeploy masih muncul error seperti `Cannot find native binding ... optional dependencies`, lakukan langkah berikut:
+
+1. Pastikan di **Railway → service `web` → Variables** sudah ada `NPM_CONFIG_OPTIONAL=false` (huruf kecil `false`).
+2. Trigger **Redeploy** ulang dan pantau log build pada tahap `npm ci`.
+3. Jika error tetap muncul, lakukan fallback clean install dependency di build environment Railway dengan menambahkan langkah berikut sebelum `npm run build`:
+   - `rm -rf node_modules package-lock.json`
+   - `npm cache clean --force`
+   - `npm install --include=optional`
+   - `npm run build`
+4. Jika build berhasil dengan fallback di atas, commit lockfile terbaru (jika berubah), lalu redeploy lagi menggunakan `npm ci` agar instalasi kembali deterministik.
+5. Dokumentasikan insiden dan simpan potongan log sebelum/sesudah mitigasi untuk kebutuhan audit deployment.
 
 ## Post-Deploy Smoke Test
 
