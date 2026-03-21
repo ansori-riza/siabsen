@@ -66,3 +66,9 @@ Untuk integrasi perangkat absensi (ESP32, RFID, fingerprint), lihat dokumentasi 
 - [Hardware Compatibility](docs/HARDWARE_COMPATIBILITY.md)
 
 Dokumen API mencakup endpoint, header wajib `X-Device-Key`, format payload RFID/fingerprint, pola response, strategi retry, dan baseline keamanan publik.
+
+## Deployment / Operasional
+
+Untuk panduan implementasi lapangan Phase 1, gunakan checklist berikut:
+
+- [Deployment Checklist Phase 1](docs/DEPLOYMENT_PHASE1.md)
