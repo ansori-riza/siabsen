@@ -52,7 +52,7 @@ class ListAbsensis extends ListRecords
                     $record->tipe,
                     optional($record->waktu_absen)?->format('Y-m-d H:i:s'),
                     $record->status,
-                    strtoupper((string) $record->metode),
+                    strtoupper($record->metode?->value ?? ''),
                     $record->perangkat?->nama ?? 'Manual',
                 ]);
             }

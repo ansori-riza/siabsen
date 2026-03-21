@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\MetodeAbsensi;
 use App\Enums\UserRole;
 use App\Filament\Resources\AbsensiResource;
 use App\Filament\Resources\AbsensiResource\Pages\ListAbsensis;
@@ -119,14 +120,14 @@ class OperationalVerificationTest extends TestCase
 
         $masuk->update([
             'status' => 'izin',
-            'metode' => 'manual',
+            'metode' => MetodeAbsensi::MANUAL->value,
             'keterangan' => 'Koreksi manual operator',
         ]);
 
         $this->assertDatabaseHas('absensis', [
             'id' => $masuk->id,
             'status' => 'izin',
-            'metode' => 'manual',
+            'metode' => MetodeAbsensi::MANUAL->value,
         ]);
 
         // Export laporan CSV hari ini
