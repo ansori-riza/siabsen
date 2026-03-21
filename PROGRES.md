@@ -209,6 +209,41 @@ public function subject(): MorphTo {
 
 ---
 
+## ✅ CHECKLIST OPERASIONAL GO-LIVE
+
+### A. Konfigurasi Wajib Sebelum Go-Live
+- [ ] Set tipe institusi (SD/SMP/SMA/SMK atau custom institusi)
+- [ ] Set kamus label operasional (hadir, terlambat, izin, sakit, alpha, pulang)
+- [ ] Mapping role pengguna (super admin, operator, wali kelas, kepala sekolah)
+- [ ] Set jadwal masuk/pulang per role target (guru dan murid)
+- [ ] Set perangkat aktif per titik absensi (gerbang, lobby, ruang guru)
+
+### B. Validasi Pra-Go-Live
+- [ ] Cek label tampil konsisten di dashboard (widget, statistik, status harian)
+- [ ] Cek label dan opsi status di form guru/murid
+- [ ] Cek label dan status pada laporan (rekap harian, bulanan, export)
+- [ ] Verifikasi role access: user hanya melihat data sesuai hak akses
+- [ ] Verifikasi jadwal efektif dipakai pada proses hitung status absensi
+
+### C. UAT (1 Hari Operasional Penuh)
+- [ ] Simulasi tap **masuk** pada jam normal dan terlambat
+- [ ] Simulasi tap **pulang** untuk guru dan murid
+- [ ] Uji koreksi absensi manual oleh operator (ubah status/jam/catatan)
+- [ ] Uji export laporan harian setelah jam pulang
+- [ ] Cocokkan hasil export dengan data dashboard dan data detail absensi
+
+### D. PIC & SLA Minggu Pertama Go-Live
+- [ ] Tetapkan PIC utama operasional (nama + kontak)
+- [ ] Tetapkan PIC teknis aplikasi/API/perangkat (nama + kontak)
+- [ ] Tetapkan jalur eskalasi (Operator → PIC Operasional → PIC Teknis)
+- [ ] SLA respon cepat: maksimal 15 menit sejak tiket diterima
+- [ ] SLA perbaikan cepat:
+  - [ ] Critical (absensi tidak bisa masuk): maksimal 2 jam
+  - [ ] Major (sebagian fitur gagal): maksimal 4 jam
+  - [ ] Minor (UI/laporan minor mismatch): maksimal 1x24 jam
+
+---
+
 ## 🚀 NEXT STEPS (Phase 2)
 
 ### ESP32 Hardware (Belum Mulai)
