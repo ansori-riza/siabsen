@@ -1,5 +1,0 @@
-<?php
-
-namespace App\Providers\Filament;
-
-use App\Mode
