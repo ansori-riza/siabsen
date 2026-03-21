@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libicu-dev \
+    # Required by pdo_pgsql extension build (provides libpq-fe.h)
     libpq-dev \
     libzip-dev \
     zip \
