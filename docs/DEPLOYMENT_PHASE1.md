@@ -15,14 +15,27 @@ Dokumen ini menjadi checklist operasional implementasi lapangan untuk deployment
 
 - [ ] Masuk ke server produksi dengan user/deployment account yang sesuai.
 - [ ] Jalankan `git pull` pada branch/tag rilis yang sudah disetujui.
+- [ ] Verifikasi `railway.json` pada branch rilis: `deploy.startCommand` saat ini fokus pada cache/warmup + `php artisan serve` dan **belum** menjalankan `php artisan migrate --force` otomatis.
 - [ ] **Railway (service `web`)**: pastikan environment variable `NIXPACKS_NODE_VERSION=22` dan `NPM_CONFIG_OPTIONAL=false` sudah diset agar fase build memakai Node.js 22 sekaligus menghindari error optional dependency npm pada native binding.
 - [ ] Jalankan `composer install --no-dev --optimize-autoloader`.
 - [ ] Jalankan `npm ci && npm run build`.
 - [ ] Jalankan `php artisan migrate --force`.
-- [ ] Jalankan `php artisan db:seed --force`.
+- [ ] Jalankan verifikasi cepat endpoint health setelah migrasi: `GET /up` harus `200 OK`.
+- [ ] Jalankan verifikasi login panel admin setelah migrasi (pastikan autentikasi berhasil dan dashboard termuat normal).
+- [ ] Jalankan `php artisan db:seed --force` **hanya** sesuai kebijakan seed (lihat bagian "Kebijakan Seed Produksi").
 - [ ] Jalankan optimasi cache Laravel (`php artisan optimize`, `php artisan config:cache`, `php artisan route:cache`, `php artisan view:cache` sesuai kebutuhan aplikasi).
 - [ ] Restart service aplikasi (PHP-FPM, web server, queue worker, dan process manager terkait) sesuai standar environment.
 - [ ] Verifikasi log aplikasi dan log web server tidak menunjukkan error kritikal pasca restart.
+
+## Kebijakan Seed Produksi
+
+Untuk mencegah data duplikat, seed **tidak** dijalankan otomatis pada setiap deploy.
+
+- **First deploy / inisialisasi environment baru**: jalankan `php artisan db:seed --force` untuk data baseline (contoh: admin awal, data referensi statis).
+- **Deploy rutin (harian/per release)**: **jangan** jalankan seed global. Jalankan hanya jika ada kebutuhan data baru yang terkontrol.
+- Jika butuh data tambahan saat deploy rutin, gunakan seeder idempotent (mis. `updateOrCreate`) dan eksekusi seeder spesifik:
+  - `php artisan db:seed --class=NamaSeeder --force`
+- Dokumentasikan setiap eksekusi seed di log rilis/deployment notes (siapa, kapan, seeder apa, dampaknya).
 
 ### Catatan Deployment Railway
 
@@ -57,8 +70,8 @@ Jika setelah redeploy masih muncul error seperti `Cannot find native binding ...
 
 ## Post-Deploy Smoke Test
 
-- [ ] Uji health API (endpoint health-check merespons normal).
-- [ ] Uji login admin (autentikasi berhasil, role/permission sesuai).
+- [ ] Uji endpoint health `/up` (harus merespons normal / `200 OK`).
+- [ ] Uji login admin panel (autentikasi berhasil, role/permission sesuai).
 - [ ] Uji CRUD master data utama (create, read, update, delete) untuk memastikan integritas modul inti.
 - [ ] Uji API device: heartbeat dari device diterima sistem.
 - [ ] Uji API device: sinkronisasi (sync) data/konfigurasi device berjalan normal.
