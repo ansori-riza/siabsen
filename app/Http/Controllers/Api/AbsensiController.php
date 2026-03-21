@@ -3,138 +3,171 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Absensi;
+use App\Models\Guru;
+use App\Models\JadwalSekolah;
+use App\Models\Murid;
 use App\Models\Perangkat;
 use App\Services\AbsensiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 
 class AbsensiController extends Controller
 {
     public function __construct(
         private AbsensiService $absensiService
-    ) {}
+    ) {
+    }
 
-    public function absen(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'rfid_uid' => 'nullable|string|max:255',
-            'fingerprint_id' => 'nullable|integer|min:1|max:162',
+        $validated = $request->validate([
+            'rfid_uid' => 'nullable|string|required_without:fingerprint_id',
+            'fingerprint_id' => 'nullable|integer|required_without:rfid_uid',
             'tipe' => 'required|in:masuk,pulang',
-            'device_id' => 'nullable|string|max:255',
-            'timestamp' => 'nullable|date',
+            'device_id' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'pesan' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        $perangkat = Perangkat::where('device_id', $validated['device_id'])
+            ->where('device_key', $request->header('X-Device-Key'))
+            ->first();
 
-        if (!$request->rfid_uid && !$request->fingerprint_id) {
+        if (!$perangkat) {
             return response()->json([
                 'success' => false,
-                'pesan' => 'RFID UID atau Fingerprint ID wajib diisi',
+                'message' => 'Perangkat tidak valid',
                 'feedback' => [
-                    'lcd_text' => 'Data tidak lengkap ❌',
-                    'buzzer' => 'beep_long',
-                    'led_color' => 'red',
-                ],
-            ], 422);
+                    'lcd' => 'Error: Device',
+                    'buzzer' => 'long',
+                    'led' => 'red'
+                ]
+            ], 401);
         }
 
-        $result = $this->absensiService->prosesTap(
-            rfidUid: $request->rfid_uid,
-            fingerprintId: $request->fingerprint_id,
-            tipe: $request->tipe,
-            deviceId: $request->device_id,
-        );
+        $perangkat->update(['last_ping' => now(), 'status' => 'online']);
 
-        $statusCode = $result['success'] ? 200 : ($result['pesan'] === 'RFID/Fingerprint tidak dikenal' ? 404 : 200);
+        $user = null;
+        $role = null;
 
-        return response()->json($result, $statusCode);
+        if (!empty($validated['rfid_uid'])) {
+            $user = Murid::where('rfid_uid', $validated['rfid_uid'])->first()
+                ?? Guru::where('rfid_uid', $validated['rfid_uid'])->first();
+            $role = $user instanceof Guru ? 'guru' : 'murid';
+        }
+
+        if (!$user && !empty($validated['fingerprint_id'])) {
+            $user = Guru::where('fingerprint_id', $validated['fingerprint_id'])->first();
+            $role = 'guru';
+        }
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'RFID/Fingerprint tidak dikenal',
+                'feedback' => [
+                    'lcd' => 'Tidak Dikenal',
+                    'buzzer' => 'long',
+                    'led' => 'red'
+                ]
+            ], 404);
+        }
+
+        $jadwal = JadwalSekolah::where('hari', now()->locale('id')->dayName)
+            ->where('role_target', $role)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$jadwal) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada jadwal hari ini',
+                'feedback' => [
+                    'lcd' => 'Tidak Ada Jadwal',
+                    'buzzer' => 'double',
+                    'led' => 'yellow'
+                ]
+            ], 400);
+        }
+
+        $waktuSekarang = now()->format('H:i:s');
+        $jamMasukDenganToleransi = Carbon::parse($jadwal->jam_masuk)
+            ->addMinutes($jadwal->toleransi_menit)
+            ->format('H:i:s');
+
+        $status = $waktuSekarang > $jamMasukDenganToleransi ? 'terlambat' : 'hadir';
+
+        $metode = !empty($validated['rfid_uid']) ? 'RFID' : 'fingerprint';
+
+        $existingAbsensi = Absensi::where('subject_type', get_class($user))
+            ->where('subject_id', $user->id)
+            ->where('tipe', $validated['tipe'])
+            ->whereDate('waktu_absen', today())
+            ->first();
+
+        if ($existingAbsensi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sudah absen ' . $validated['tipe'] . ' hari ini',
+                'feedback' => [
+                    'lcd' => 'Sudah Absen',
+                    'buzzer' => 'short',
+                    'led' => 'yellow'
+                ]
+            ], 400);
+        }
+
+        $absensi = Absensi::create([
+            'sekolah_id' => $user->sekolah_id,
+            'perangkat_id' => $perangkat->id,
+            'subject_type' => get_class($user),
+            'subject_id' => $user->id,
+            'tipe' => $validated['tipe'],
+            'status' => $status,
+            'metode' => $metode,
+            'waktu_absen' => now(),
+        ]);
+
+        $nama = $user->nama;
+        $statusText = $status === 'hadir' ? 'HADIR' : 'TERLAMBAT';
+        $emoji = $status === 'hadir' ? '✓' : '!';
+
+        return response()->json([
+            'success' => true,
+            'nama' => $nama,
+            'role' => $role,
+            'status' => $status,
+            'metode' => $metode,
+            'waktu' => now()->format('H:i'),
+            'feedback' => [
+                'lcd' => "{$nama} {$emoji} {$statusText} - " . now()->format('H:i'),
+                'buzzer' => $status === 'hadir' ? 'short' : 'double',
+                'led' => $status === 'hadir' ? 'green' : 'yellow'
+            ]
+        ]);
     }
 
     public function heartbeat(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'device_id' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'error' => 'Device ID required'], 422);
+        $perangkat = Perangkat::where('device_id', $validated['device_id'])
+            ->where('device_key', $request->header('X-Device-Key'))
+            ->first();
+
+        if (!$perangkat) {
+            return response()->json(['success' => false], 401);
         }
 
-        $device = Perangkat::where('device_key', $request->device_id)->first();
-
-        if (!$device) {
-            return response()->json(['success' => false, 'error' => 'Device not found'], 404);
-        }
-
-        $device->markOnline();
+        $perangkat->update([
+            'last_ping' => now(),
+            'status' => 'online',
+        ]);
 
         return response()->json([
             'success' => true,
-            'device' => [
-                'id' => $device->id,
-                'nama' => $device->nama,
-                'status' => 'online',
-            ],
-        ]);
-    }
-
-    public function sync(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'device_id' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'error' => 'Device ID required'], 422);
-        }
-
-        $device = Perangkat::where('device_key', $request->device_id)->first();
-
-        if (!$device) {
-            return response()->json(['success' => false, 'error' => 'Device not found'], 404);
-        }
-
-        // Get relevant config for this device
-        $sekolah = $device->sekolah;
-        $hariIni = now()->dayOfWeek;
-
-        $jadwalMurid = $sekolah->jadwalSekolahs()
-            ->where('role_target', 'murid')
-            ->where('hari', $hariIni)
-            ->where('is_active', true)
-            ->first();
-
-        $jadwalGuru = $sekolah->jadwalSekolahs()
-            ->where('role_target', 'guru')
-            ->where('hari', $hariIni)
-            ->where('is_active', true)
-            ->first();
-
-        return response()->json([
-            'success' => true,
-            'sekolah' => [
-                'nama' => $sekolah->nama,
-                'theme_color' => $sekolah->theme_color,
-            ],
-            'jadwal' => [
-                'murid' => $jadwalMurid ? [
-                    'jam_masuk' => $jadwalMurid->jam_masuk,
-                    'jam_pulang' => $jadwalMurid->jam_pulang,
-                    'toleransi_menit' => $jadwalMurid->toleransi_menit,
-                ] : null,
-                'guru' => $jadwalGuru ? [
-                    'jam_masuk' => $jadwalGuru->jam_masuk,
-                    'jam_pulang' => $jadwalGuru->jam_pulang,
-                    'toleransi_menit' => $jadwalGuru->toleransi_menit,
-                ] : null,
-            ],
             'timestamp' => now()->toIso8601String(),
         ]);
     }
