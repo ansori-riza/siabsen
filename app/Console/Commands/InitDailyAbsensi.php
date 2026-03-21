@@ -85,6 +85,7 @@ class InitDailyAbsensi extends Command
             'tipe' => 'masuk',
             'status' => 'alpha',
             'metode' => 'manual',
+            'source' => 'system',
             'waktu_absen' => today()->startOfDay(),
             'keterangan' => 'Auto-generated: Belum absen',
         ]);
