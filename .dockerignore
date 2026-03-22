@@ -1,0 +1,80 @@
+# Git
+.git
+.gitignore
+.github
+
+# Composer
+vendor/
+composer.lock
+
+# NPM
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel
+.env
+.env.local
+.env.*.local
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Storage & Cache (keep structure but not contents)
+storage/app/public/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+!storage/app/public/.gitignore
+!storage/framework/cache/data/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/testing/.gitignore
+!storage/framework/views/.gitignore
+!storage/logs/.gitignore
+
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+.docker
+
+# Testing
+phpunit.xml
+phpunit.xml.dist
+tests/
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# CI/CD
+.github/
+.travis.yml
+.gitlab-ci.yml
+
+# Local development
+storage/*.key
+storage/pail
+database/*.sqlite
+database/*.sqlite-journal

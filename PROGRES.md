@@ -134,7 +134,7 @@ public function subject(): MorphTo {
 
 ### B. Kendala Deployment (Server)
 
-#### 1. Asset URL Filament (PERSISTENT ⚠️)
+#### 1. Asset URL Filament (RESOLVED ✅)
 **Masalah:** CSS/JS Filament di-load dari TCP address internal (`http://ts2.zocomputer.io:10950`) bukan dari HTTPS publik (`https://siabsen-riza.zocomputer.io`)
 
 **Dampak:** 
@@ -142,22 +142,17 @@ public function subject(): MorphTo {
 - Tampilan admin panel "unstyled" - putih polos tanpa CSS
 - Fungsionalitas ada tapi UI rusak
 
-**Percobaan Fix:**
-1. ✅ Set `ASSET_URL=https://siabsen-riza.zocomputer.io` di .env
-2. ✅ Buat ForceHttps middleware
-3. ✅ Modifikasi AppServiceProvider untuk force HTTPS URL
-4. ✅ Clear all cache (config, route, view, compiled)
+**Solusi:**
+1. Membuat middleware `ForceAssetUrl` yang memaksa URL root berdasarkan `APP_URL`
+2. Update `AppServiceProvider` untuk memanggil `URL::forceRootUrl()` dan `URL::forceScheme()` di boot method
+3. Register middleware di `bootstrap/app.php`
 
-**Hasil:** Semua percobaan gagal. Filament tetap generate URL asset dari internal address.
+**Implementasi:**
+- `app/Http/Middleware/ForceAssetUrl.php` - Middleware untuk force URL root
+- `app/Providers/AppServiceProvider.php` - Force URL di boot method
+- `bootstrap/app.php` - Register middleware dengan `prepend()`
 
-**Root Cause:** Issue di Filament v3 + PHP built-in server (`php -S`) + Reverse Proxy (Zo Space)
-
-**Workaround:** 
-- Clone repo dan jalankan di local dengan `php artisan serve` atau nginx/apache
-- Deploy ke shared hosting dengan proper SSL
-- Deploy ke VPS dengan domain sendiri
-
-**Status:** ⚠️ Known Issue - Perlu riset lebih lanjut atau bantuan dari Filament community
+**Status:** ✅ Fixed - Admin panel sekarang tampil dengan styling yang benar
 
 ---
 
