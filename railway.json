@@ -3,8 +3,5 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile"
-  },
-  "deploy": {
-    "startCommand": "mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs && chmod -R 777 storage bootstrap/cache && php artisan optimize:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
   }
 }
