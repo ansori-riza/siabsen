@@ -37,4 +37,7 @@ RUN composer install --no-dev --optimize-autoloader \
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "php artisan optimize:clear || true; php artisan config:cache || true; php artisan migrate --force --no-interaction || true; exec php artisan serve --host=0.0.0.0 --port=$PORT"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
