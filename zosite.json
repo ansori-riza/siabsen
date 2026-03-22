@@ -1,0 +1,32 @@
+{
+  "$schema": "https://zo.computer/zosite.schema.json",
+  "name": "SiAbsen",
+  "type": "laravel",
+  "build": {
+    "install": "composer install --no-dev --optimize-autoloader && npm ci && npm run build",
+    "copy": [
+      "public/build",
+      "public/css",
+      "public/js",
+      "public/favicon.ico",
+      "public/robots.txt",
+      "public/.htaccess"
+    ]
+  },
+  "start": {
+    "command": "php artisan serve --host=0.0.0.0 --port=$PORT",
+    "env": {
+      "APP_ENV": "production",
+      "APP_DEBUG": "false",
+      "APP_URL": "https://siabsen-riza.zocomputer.io",
+      "SESSION_DRIVER": "file",
+      "SESSION_LIFETIME": "120",
+      "SESSION_SECURE_COOKIE": "true",
+      "SESSION_SAME_SITE": "lax",
+      "SESSION_DOMAIN": "siabsen-riza.zocomputer.io",
+      "CACHE_STORE": "file",
+      "LOG_CHANNEL": "stderr",
+      "TRUSTED_PROXIES": "*"
+    }
+  }
+}
