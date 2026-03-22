@@ -1,0 +1,10 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = ""  # Use CMD from Dockerfile
+healthcheckPath = "/up"
+healthcheckPort = 80
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
