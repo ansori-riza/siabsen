@@ -18,6 +18,7 @@ class PerangkatResource extends Resource
     protected static ?string $modelLabel = 'Perangkat';
     protected static ?string $pluralModelLabel = 'Perangkat';
     protected static ?int $navigationSort = 6;
+    protected static ?string $navigationGroup = 'Pengaturan';
 
     public static function form(Form $form): Form
     {

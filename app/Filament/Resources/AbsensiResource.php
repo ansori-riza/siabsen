@@ -22,6 +22,7 @@ class AbsensiResource extends Resource
     protected static ?string $modelLabel = 'Absensi';
     protected static ?string $pluralModelLabel = 'Absensi';
     protected static ?int $navigationSort = 7;
+    protected static ?string $navigationGroup = 'Absensi';
 
     public static function canViewAny(): bool
     {

@@ -19,6 +19,7 @@ class MuridResource extends Resource
     protected static ?string $modelLabel = 'Murid';
     protected static ?string $pluralModelLabel = 'Murid';
     protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Master Data';
 
     public static function form(Form $form): Form
     {

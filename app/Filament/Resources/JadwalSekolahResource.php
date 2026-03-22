@@ -20,6 +20,7 @@ class JadwalSekolahResource extends Resource
     protected static ?string $modelLabel = 'Jadwal';
     protected static ?string $pluralModelLabel = 'Jadwal';
     protected static ?int $navigationSort = 5;
+    protected static ?string $navigationGroup = 'Pengaturan';
 
     public static function form(Form $form): Form
     {

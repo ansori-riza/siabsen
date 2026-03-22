@@ -20,6 +20,7 @@ class KelasResource extends Resource
     protected static ?string $modelLabel = 'Kelas';
     protected static ?string $pluralModelLabel = 'Kelas';
     protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Master Data';
 
     public static function form(Form $form): Form
     {

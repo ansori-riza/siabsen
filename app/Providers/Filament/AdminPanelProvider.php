@@ -25,11 +25,21 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\Login::class)
+            ->brandName('SiAbsen')
+            ->brandLogo(fn () => view('filament.brand-logo'))
+            ->brandLogoHeight('2rem')
+            ->favicon(fn () => url('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->navigationGroups([
+                'Master Data',
+                'Absensi',
+                'Laporan',
+                'Pengaturan',
+            ])
             ->pages([
                 Pages\Dashboard::class,
             ])
