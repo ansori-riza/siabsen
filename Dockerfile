@@ -32,7 +32,7 @@ RUN mkdir -p /etc/apt/keyrings \
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader \
- && npm install \
+ && npm ci \
  && npm run build
 
 EXPOSE 8000
