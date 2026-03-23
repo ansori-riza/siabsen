@@ -1,0 +1,8 @@
+# Page snapshot
+
+```yaml
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - heading "419" [level=1] [ref=e5]
+    - generic [ref=e6]: Page Expired
+```

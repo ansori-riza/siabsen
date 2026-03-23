@@ -2,7 +2,7 @@
 set -e
 
 APP_DIR="/home/workspace/SiAbsen"
-PORT="${PORT:-8080}"
+PORT="${PORT:-8000}"
 PHP_FPM_PORT=9001
 
 echo "[SiAbsen] Starting Laravel application on port $PORT..."
@@ -115,33 +115,68 @@ rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default 2>/dev/nul
 # Test nginx config
 nginx -t || exit 1
 
-# Kill any existing php-fpm processes using our port
-pkill -f "php-fpm.*$PHP_FPM_PORT" 2>/dev/null || true
-sleep 1
+# Check if PHP-FPM is already running on our port
+PHP_FPM_RUNNING=0
+if lsof -i :$PHP_FPM_PORT >/dev/null 2>&1; then
+    echo "[SiAbsen] PHP-FPM already running on port $PHP_FPM_PORT"
+    PHP_FPM_RUNNING=1
+    # Get the main process PID
+    PHP_FPM_PID=$(lsof -t -i :$PHP_FPM_PORT | head -1)
+fi
 
-# Start PHP-FPM in background
-echo "[SiAbsen] Starting PHP-FPM on port $PHP_FPM_PORT..."
-php-fpm8.3 -y $PHP_FPM_CONF &
-PHP_FPM_PID=$!
+# Start PHP-FPM if not running
+if [ $PHP_FPM_RUNNING -eq 0 ]; then
+    echo "[SiAbsen] Starting PHP-FPM on port $PHP_FPM_PORT..."
+    php-fpm8.3 -y $PHP_FPM_CONF &
+    PHP_FPM_PID=$!
+    
+    # Wait for PHP-FPM to be ready
+    for i in {1..15}; do
+        if nc -z 127.0.0.1 $PHP_FPM_PORT 2>/dev/null; then
+            echo "[SiAbsen] PHP-FPM is ready on port $PHP_FPM_PORT"
+            break
+        fi
+        sleep 1
+    done
+    
+    if ! nc -z 127.0.0.1 $PHP_FPM_PORT 2>/dev/null; then
+        echo "[SiAbsen] ERROR: PHP-FPM is not listening on port $PHP_FPM_PORT!"
+        exit 1
+    fi
+fi
 
-# Wait a moment for PHP-FPM to start
-sleep 2
+# Check if Nginx is already running on our port
+NGINX_RUNNING=0
+if lsof -i :$PORT >/dev/null 2>&1; then
+    echo "[SiAbsen] Nginx already running on port $PORT"
+    NGINX_RUNNING=1
+    NGINX_PID=$(lsof -t -i :$PORT | head -1)
+fi
 
-# Start nginx in foreground
-echo "[SiAbsen] Starting Nginx on port $PORT..."
-nginx -g "daemon off;" &
-NGINX_PID=$!
+# Start Nginx if not running
+if [ $NGINX_RUNNING -eq 0 ]; then
+    echo "[SiAbsen] Starting Nginx on port $PORT..."
+    nginx -g "daemon off;" &
+    NGINX_PID=$!
+fi
 
 # Function to cleanup on exit
 cleanup() {
     echo "[SiAbsen] Shutting down..."
-    kill $NGINX_PID 2>/dev/null || true
-    kill $PHP_FPM_PID 2>/dev/null || true
-    wait
+    if [ $NGINX_RUNNING -eq 0 ]; then
+        kill $NGINX_PID 2>/dev/null || true
+    fi
+    if [ $PHP_FPM_RUNNING -eq 0 ]; then
+        kill $PHP_FPM_PID 2>/dev/null || true
+    fi
     exit 0
 }
 
 trap cleanup SIGTERM SIGINT
 
-# Wait for both processes
-wait $PHP_FPM_PID $NGINX_PID
+# Keep the script running and monitor processes
+echo "[SiAbsen] Application started successfully"
+while true; do
+    sleep 30
+    # Just keep running - supervisor will handle restarts
+done

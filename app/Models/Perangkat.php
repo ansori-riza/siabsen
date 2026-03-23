@@ -14,10 +14,15 @@ class Perangkat extends Model
 
     protected $fillable = [
         'sekolah_id',
+        'kelas_id',
         'nama',
         'lokasi',
         'device_key',
         'tipe',
+        'tipe_fungsi',
+        'vendor_type',
+        'ip_address',
+        'port',
         'status',
         'last_ping',
         'is_active',
@@ -40,6 +45,11 @@ class Perangkat extends Model
     public function absensis(): HasMany
     {
         return $this->hasMany(Absensi::class);
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class);
     }
 
     public function isOnline(): bool
