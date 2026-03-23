@@ -37,7 +37,7 @@
 - ✅ Izin - Perizinan masuk/pulang
 - ✅ AuditLog - Immutable audit trail
 
-### 3. Filament Admin Panel (90%)
+### 3. Filament Admin Panel (95%)
 - ✅ Filament v3.x terinstall
 - ✅ AdminPanelProvider terkonfigurasi
 - ✅ Resources:
@@ -48,6 +48,7 @@
   - JadwalSekolahResource - Pengaturan jadwal
   - PerangkatResource - Manajemen device ESP32
   - AbsensiResource - Monitoring & input manual absensi
+  - UserResource - Manajemen pengguna & role (NEW ✅)
 - ⚠️ Widget Dashboard (partial) - Statistik sederhana
 
 ### 4. API Endpoints (95%)
@@ -159,7 +160,7 @@ public function subject(): MorphTo {
 #### 2. GitHub Private Repo Access (RESOLVED ✅)
 **Masalah:** Tidak bisa push ke private repo `ansoririza/siabsen` tanpa Personal Access Token (PAT)
 
-**Solusi:** User provide PAT (`REDACTED`) dan berhasil push
+**Solusi:** User provide PAT (personal access token) dan berhasil push
 
 **Status:** ✅ Fixed
 
@@ -202,6 +203,7 @@ public function subject(): MorphTo {
 - [x] Monitoring Absensi
 - [x] Input Manual Absensi
 - [x] Audit Trail
+- [x] User Management (CRUD Pengguna dengan Role) ✅ NEW
 
 ### Deployment
 - [x] GitHub repo

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\ForceAssetUrl;
 use App\Http\Middleware\ValidateDeviceKey;
 use Illuminate\Foundation\Application;
@@ -16,10 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'device.key' => ValidateDeviceKey::class,
+            'role' => CheckRole::class,
         ]);
         
-        // Force asset URL untuk Filament
-        $middleware->prepend(ForceAssetUrl::class);
+        // Force asset URL untuk Filament - tambahkan ke web middleware group
+        // agar berjalan setelah session middleware
+        $middleware->web(append: [
+            ForceAssetUrl::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

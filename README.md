@@ -2,12 +2,15 @@
 
 SiAbsen adalah aplikasi absensi sekolah/pondok berbasis Laravel untuk mencatat kehadiran murid dan guru secara digital melalui perangkat hardware (RFID + fingerprint), dengan monitoring terpusat lewat admin panel.
 
+> **Update:** Admin panel sekarang menggunakan **AdminLTE** (Bootstrap) setelah migrasi dari Filament karena issue asset URL di deployment.
+> Dokumentasi migrasi lengkap: [docs/ADMINLTE_MIGRATION.md](docs/ADMINLTE_MIGRATION.md)
+
 ## Fitur Utama Phase 1
 
-- **Admin panel (Filament)** untuk manajemen master data sekolah, guru, murid, kelas, jadwal, perangkat, dan absensi.
+- **Admin panel (AdminLTE)** untuk manajemen master data sekolah, guru, murid, kelas, jadwal, perangkat, dan absensi.
 - **API device** untuk menerima event absensi dari perangkat (ESP32/vendor adapter) dengan autentikasi `X-Device-Key`.
 - **Manajemen jadwal** masuk/pulang murid & guru beserta toleransi keterlambatan.
-- **Monitoring absensi** real-time + input/manual correction dengan jejak audit.
+- **Monitoring absensi** real-time + input/manual correction.
 - **Role user** berbasis kebutuhan operasional sekolah (`super_admin`, `operator`, `wali_kelas`, `kepala_sekolah`).
 
 ## Arsitektur Singkat
@@ -15,189 +18,159 @@ SiAbsen adalah aplikasi absensi sekolah/pondok berbasis Laravel untuk mencatat k
 Alur sistem inti:
 
 1. **Aplikasi Laravel (core platform)**
-   - Menyediakan panel admin, API, logic status kehadiran, laporan, dan scheduler.
+   - Menyediakan panel admin, API, logic status kehadiran, laporan.
+   - Stack: Laravel 12.x + AdminLTE 3 + Bootstrap 4 + Blade
 2. **Perangkat absensi**
    - ESP32 custom atau device vendor via **middleware adapter** untuk standarisasi payload/event.
 3. **Database**
-   - Menyimpan data master, jadwal, event absensi, izin, perangkat, dan audit log.
+   - Menyimpan data master, jadwal, event absensi, perangkat.
 
 Skema sederhana:
 
-`Device (RFID/Fingerprint) -> API Laravel -> Service/Rule Engine -> Database -> Dashboard/Reporting`
+`Device (RFID/Fingerprint) -> API Laravel -> Database -> AdminLTE Dashboard`
 
 ## Dokumentasi Terkait
 
-- [Product Requirement Document (PRD)](docs/PRD.md)
-- [Progress Implementasi](docs/PROGRES.md)
-- [API Hardware](docs/API_HARDWARE.md)
-- [Hardware Compatibility](docs/HARDWARE_COMPATIBILITY.md)
-- [Runbook Hardware Onboarding](docs/RUNBOOK_HARDWARE_ONBOARDING.md)
-- [Deployment Checklist Phase 1](docs/DEPLOYMENT_PHASE1.md)
+- **[Product Requirement Document (PRD)](docs/PRD.md)** - Spesifikasi lengkap produk
+- **[Migration Report (ADMINLTE_MIGRATION.md)](docs/ADMINLTE_MIGRATION.md)** - Dokumentasi migrasi Filament → AdminLTE
+- **[API Hardware](docs/API_HARDWARE.md)** - Kontrak API untuk perangkat
+- **[Hardware Compatibility](docs/HARDWARE_COMPATIBILITY.md)** - Daftar hardware yang support
+- **[Runbook Hardware Onboarding](docs/RUNBOOK_HARDWARE_ONBOARDING.md)** - Panduan onboarding perangkat
+- **[Deployment Checklist Phase 1](docs/DEPLOYMENT_PHASE1.md)** - Checklist deployment
 
 ## Quick Start (Local Development)
 
-> Contoh berikut asumsi environment lokal Linux/macOS + PHP + Composer + Node.js tersedia.
+### 1. Install dependency
 
-1. **Install dependency**
+```bash
+composer install
+```
 
-   ```bash
-   composer install
-   npm install
-   ```
+### 2. Setup `.env`
 
-2. **Setup `.env`**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+### 3. Migrasi + seed data awal
 
-3. **Migrasi + seed data awal**
+```bash
+php artisan migrate --seed
+```
 
-   ```bash
-   php artisan migrate --seed
-   ```
+### 4. Jalankan aplikasi
 
-4. **Build asset + jalankan app**
+```bash
+php artisan serve
+```
 
-   ```bash
-   npm run dev
-   php artisan serve
-   ```
+Akses admin panel: http://localhost:8000/login
 
-5. **(Opsional) Jalankan queue worker & scheduler loop di lokal**
+### 5. Login default
 
-   ```bash
-   php artisan queue:work
-   php artisan schedule:work
-   ```
+- **Email:** admin@siabsen.com
+- **Password:** password
 
 ## Konfigurasi Penting
 
-Pastikan variabel berikut benar sebelum onboarding device atau go-live:
+Pastikan variabel berikut benar:
 
-- **APP URL**
-  - `APP_URL` harus sesuai domain/aplikasi yang diakses user.
-  - Untuk deploy Railway, isi `APP_URL` secara **eksplisit** dengan domain aktif service, mis. `https://<service>.up.railway.app`, khususnya saat variabel otomatis seperti `RAILWAY_STATIC_URL` tidak tersedia.
-  - Jika `APP_URL` salah, dampaknya bisa meluas: redirect login/logout melenceng, callback autentikasi gagal, domain/scope cookie tidak cocok (session sering logout), dan URL asset (CSS/JS/admin panel) bisa mengarah ke host yang salah.
+- **APP_URL**
+  - `APP_URL` harus sesuai domain yang diakses user.
+  - Contoh: `https://siabsen-riza.zocomputer.io`
 - **Database**
-  - `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
+  - `DB_CONNECTION=sqlite` (development)
+  - Production: ganti ke `mysql` atau `pgsql`
 - **Timezone**
-  - Set `APP_TIMEZONE` (dan timezone server) agar status hadir/terlambat akurat.
-- **Queue & Scheduler**
-  - Tentukan `QUEUE_CONNECTION`.
-  - Pastikan worker queue aktif untuk job background.
-  - Pastikan scheduler aktif untuk task terjadwal (termasuk proses otomatis terkait absensi).
+  - Set `APP_TIMEZONE=Asia/Jakarta`
 
 ## API Ringkas untuk Hardware
 
 Base path API: `/api`
 
-- **POST** `/api/absensi`
-  - Header wajib: `X-Device-Key: <device_key>`
-  - Payload minimal:
-    - `tipe`: `masuk` / `pulang`
-    - salah satu identitas: `rfid_uid` **atau** `fingerprint_id`
-- **POST** `/api/perangkat/heartbeat`
-  - Update status/last seen perangkat.
-- **GET** `/api/perangkat/sync`
-  - Sinkronisasi konfigurasi/data referensi ke perangkat.
+### POST /api/absensi
+- Header wajib: `X-Device-Key: <device_key>`
+- Payload minimal:
+  - `tipe`: `masuk` / `pulang`
+  - `rfid_uid` atau `fingerprint_id`
 
-Lihat kontrak lengkap, contoh request/response, dan retry strategy di [docs/API_HARDWARE.md](docs/API_HARDWARE.md).
+### POST /api/perangkat/heartbeat
+- Update status/last seen perangkat.
+
+### GET /api/perangkat/sync
+- Sinkronisasi konfigurasi ke perangkat.
+
+Lihat kontrak lengkap di [docs/API_HARDWARE.md](docs/API_HARDWARE.md).
 
 ## Role & Akses
 
-Role operasional saat ini:
+Role operasional:
 
-- **super_admin**: kontrol penuh sistem, pengaturan global, dan user management.
-- **operator**: operasional harian (master data, perangkat, monitoring, koreksi data sesuai kebijakan).
-- **wali_kelas**: pantau absensi kelas binaan, verifikasi/koreksi terbatas, input izin.
-- **kepala_sekolah**: akses dashboard dan laporan monitoring tingkat sekolah.
+- **super_admin**: kontrol penuh sistem, pengaturan global, user management.
+- **operator**: operasional harian (master data, monitoring, koreksi).
+- **wali_kelas**: pantau absensi kelas, verifikasi terbatas.
+- **kepala_sekolah**: dashboard dan laporan monitoring.
 
 ## Status Implementasi
 
-Ringkasan posisi saat ini:
+### AdminLTE Panel (Aktif)
+- ✅ Dashboard monitoring
+- ✅ CRUD Master Data (Sekolah, Guru, Murid, Kelas)
+- ✅ Jadwal Sekolah
+- ✅ Manajemen Perangkat
+- ✅ Monitoring Absensi + Input Manual
+- ✅ Authentication system
 
-- **Phase 1 (MVP) — berjalan/aktif dikembangkan**
-  - Fokus: core absensi stabil, admin panel, API device, role-based access, audit, monitoring.
-  - Integrasi device custom (ESP32) dan jalur adapter vendor diposisikan terpisah agar core tetap stabil.
-- **Roadmap berikutnya (Phase 2+)**
-  - Penguatan kanal notifikasi, portal/mobile experience, perluasan skema verifikasi, dan integrasi lanjutan sesuai PRD.
+### API Device (WIP)
+- ⚠️ Routes terdefinisi, logic implementasi ongoing
 
-Untuk detail progres terbaru per modul, issue aktif, checklist, dan next steps, lihat [docs/PROGRES.md](docs/PROGRES.md) dan [docs/PRD.md](docs/PRD.md).
+### Phase 2+ (Roadmap)
+- 🔵 Fingerprint enrollment UI
+- 🔵 RFID enrollment via web
+- 🔵 Notifikasi WhatsApp
+- 🔵 Mobile app portal
 
 ## Troubleshooting Umum
 
-### 1) Asset admin panel tidak load / tampilan berantakan
+### 1. Asset tidak load / tampilan berantakan
+```bash
+php artisan optimize:clear
+```
 
-- Verifikasi `APP_URL` dan skema HTTPS/HTTP konsisten.
-- Bersihkan cache aplikasi:
+### 2. Auth device gagal (401)
+Pastikan header `X-Device-Key` dikirim di setiap request.
 
-  ```bash
-  php artisan optimize:clear
-  ```
+### 3. Database error
+```bash
+php artisan migrate:fresh --seed
+```
 
-- Build ulang asset frontend:
+## Deployment Produksi
 
-  ```bash
-  npm run build
-  ```
-
-- Cek reverse proxy/web server agar tidak mengubah host/protocol internal secara salah.
-
-### 2) Auth device gagal (`401` / `Missing X-Device-Key`)
-
-- Pastikan header `X-Device-Key` dikirim di setiap request device.
-- Validasi `device_key` aktif dan cocok dengan data perangkat.
-- Cek environment API target (jangan tertukar antara local/staging/production).
-
-### 3) Scheduler tidak jalan
-
-- Pastikan scheduler process aktif (`php artisan schedule:work`) **atau** cron server menjalankan `php artisan schedule:run` setiap menit.
-- Pastikan timezone server sesuai konfigurasi aplikasi.
-- Cek log aplikasi untuk command yang gagal.
-
-## Catatan Operasional Deploy Produksi
-
-- `railway.json` saat ini belum memasukkan migrate otomatis pada `deploy.startCommand`; migrasi tetap dijalankan sebagai langkah operasional terpisah.
-- Urutan minimum setelah release:
-  1. `php artisan migrate --force`
-  2. Verifikasi `GET /up` mengembalikan `200 OK`
-  3. Verifikasi login panel admin berhasil
-  4. Jalankan seed bila diperlukan sesuai kebijakan
-- Kebijakan seed:
-  - **First deploy**: boleh menjalankan `php artisan db:seed --force` untuk bootstrap data awal.
-  - **Deploy rutin**: hindari seed global untuk mencegah duplikasi; gunakan seeder idempotent/seeder spesifik bila ada kebutuhan data baru.
+1. `php artisan migrate --force`
+2. Verifikasi login panel admin
+3. Setup backup harian
 
 ## Kontribusi Tim
 
 ### Branching Standard
+- `main` → branch stabil/produksi
+- `feature/<nama-fitur>` → fitur baru
+- `fix/<nama-bug>` → perbaikan bug
 
-- `main` -> branch stabil/produksi.
-- Gunakan branch fitur/perbaikan dari `main` dengan pola:
-  - `feature/<nama-fitur>`
-  - `fix/<nama-bug>`
-  - `chore/<nama-pekerjaan>`
+### Commit Convention
+- `feat: tambah endpoint baru`
+- `fix: validasi input`
+- `docs: update dokumentasi`
 
-Contoh:
-- `feature/api-device-heartbeat`
-- `fix/asset-url-filament`
+## Kontak & Support
 
-### Commit Naming Convention
+- **Zo Space URL:** https://siabsen-riza.zocomputer.io
+- **API Base URL:** https://siabsen-riza.zocomputer.io/api
 
-Gunakan gaya commit konsisten (disarankan Conventional Commits):
+---
 
-- `feat: tambah endpoint heartbeat perangkat`
-- `fix: validasi header x-device-key`
-- `docs: update runbook onboarding hardware`
-- `chore: rapikan konfigurasi scheduler`
-
-### Alur Pull Request (PR)
-
-1. Buat branch dari `main`.
-2. Implementasi perubahan + update dokumentasi terkait.
-3. Jalankan pengujian/check lokal.
-4. Push branch dan buka PR.
-5. Isi deskripsi PR minimal: tujuan, scope, cara uji, risiko.
-6. Minta review minimal 1 reviewer tim.
-7. Merge setelah approval dan seluruh check wajib lulus.
+**Last Updated:** 22 Maret 2026  
+**Versi:** 1.0 (AdminLTE Migration)  
+**Stack:** Laravel 12.x + AdminLTE 3 + Bootstrap 4

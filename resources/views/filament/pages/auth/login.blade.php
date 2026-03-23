@@ -1,17 +1,23 @@
 <x-filament-panels::page.simple class="siabsen-login">
     @php
         $sekolah = \App\Models\Sekolah::query()->where('is_active', true)->first() ?? \App\Models\Sekolah::query()->first();
+        $logoUrl = $sekolah?->logo ? asset('storage/' . $sekolah->logo) : null;
+        $themeColor = $sekolah?->theme_color ?? '#1971C2';
     @endphp
 
     {{-- Custom Login Wrapper --}}
     <div class="siabsen-login-wrapper">
         {{-- Logo & Brand Section --}}
         <div class="login-header">
-            <div class="logo-container">
-                <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2v4m0 12v4M2 12h4m12 0h4" opacity="0.5"/>
-                </svg>
+            <div class="logo-container" style="--theme-color: {{ $themeColor }};">
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="{{ $sekolah->nama }}" class="logo-image">
+                @else
+                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2v4m0 12v4M2 12h4m12 0h4" opacity="0.5"/>
+                    </svg>
+                @endif
             </div>
             
             <h1 class="brand-title">SiAbsen</h1>
@@ -137,16 +143,24 @@
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
             margin-bottom: 1.5rem;
             transition: transform 0.3s ease;
+            overflow: hidden;
         }
 
         .logo-container:hover {
             transform: scale(1.05);
         }
 
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
         .logo-icon {
             width: 40px;
             height: 40px;
-            color: #2563eb;
+            color: var(--theme-color, #2563eb);
         }
 
         .brand-title {

@@ -319,17 +319,32 @@
                 padding-right: 1.25rem;
             }
         }
+
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
+    @php
+        $logoUrl = $sekolah?->logo ? asset('storage/' . $sekolah->logo) : null;
+        $themeColor = $sekolah?->theme_color ?? '#1971C2';
+    @endphp
     <div class="login-wrapper">
         {{-- Logo & Brand Section --}}
         <div class="login-header">
-            <div class="logo-container">
-                <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2v4m0 12v4M2 12h4m12 0h4" opacity="0.5"/>
-                </svg>
+            <div class="logo-container" style="--theme-color: {{ $themeColor }};">
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="{{ $sekolah->nama }}" class="logo-image">
+                @else
+                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2v4m0 12v4M2 12h4m12 0h4" opacity="0.5"/>
+                    </svg>
+                @endif
             </div>
 
             <h1 class="brand-title">SiAbsen</h1>
@@ -375,7 +390,7 @@
                         id="email"
                         name="email"
                         class="form-input @error('email') is-invalid @enderror"
-                        placeholder="admin@siabsen.test"
+                        placeholder="admin@siabsen.com"
                         value="{{ old('email') }}"
                         required
                         autofocus
@@ -415,7 +430,7 @@
 
             <div class="card-footer">
                 <p>
-                    Default login: <strong>admin@siabsen.test</strong> / <strong>password</strong>
+                    Default login: <strong>admin@siabsen.com</strong> / <strong>password</strong>
                 </p>
             </div>
         </div>
